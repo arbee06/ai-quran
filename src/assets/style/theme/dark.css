@@ -1,0 +1,144 @@
+body.dark {
+  --bg-color: #1a202c;
+  --surface-color: #2d3748;
+  --text-primary: #e2e8f0;
+  --text-secondary: #a0aec0;
+  --text-muted: #718096;
+  
+  --border-color: #4a5568;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  
+  --nav-bg: #1a202c;
+  --nav-text: #e2e8f0;
+}
+
+body.dark .hero-section {
+  background: linear-gradient(135deg, #553c9a 0%, #6b46c1 100%);
+}
+
+body.dark .feature-card {
+  background: var(--surface-color);
+  box-shadow: var(--shadow-md);
+}
+
+body.dark .surah-card {
+  background: var(--surface-color);
+  box-shadow: var(--shadow-sm);
+}
+
+body.dark .surah-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+body.dark .verse-item {
+  background: var(--surface-color);
+  box-shadow: var(--shadow-sm);
+}
+
+body.dark .verse-item:hover {
+  box-shadow: var(--shadow-md);
+}
+
+body.dark .verse-number {
+  background: #4a5568;
+  color: var(--text-primary);
+}
+
+body.dark .surah-number {
+  background: #4a5568;
+  color: var(--text-primary);
+}
+
+body.dark .search-input {
+  background: var(--surface-color);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark .search-input::placeholder {
+  color: var(--text-muted);
+}
+
+body.dark .btn-secondary {
+  background: #4a5568;
+  color: var(--text-primary);
+}
+
+body.dark .btn-secondary:hover {
+  background: #718096;
+}
+
+body.dark .btn-icon {
+  background: #4a5568;
+  color: var(--text-primary);
+}
+
+body.dark .btn-icon:hover {
+  background: #718096;
+}
+
+body.dark .filter-btn {
+  background: var(--surface-color);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark .badge {
+  background: rgba(159, 122, 234, 0.2);
+  color: #b794f4;
+}
+
+body.dark .ai-chat {
+  background: var(--surface-color);
+  box-shadow: var(--shadow-lg);
+}
+
+body.dark .message.assistant .message-content {
+  background: #4a5568;
+  color: var(--text-primary);
+}
+
+body.dark .context-display {
+  background: #4a5568;
+  border-color: var(--border-color);
+}
+
+body.dark .message-input {
+  background: #4a5568;
+  border-color: #718096;
+  color: var(--text-primary);
+}
+
+body.dark .message-input::placeholder {
+  color: var(--text-muted);
+}
+
+body.dark .quick-btn {
+  background: #4a5568;
+  border-color: #718096;
+  color: var(--text-primary);
+}
+
+body.dark .quick-btn:hover {
+  background: #718096;
+}
+
+body.dark .api-key-input {
+  background: #4a5568;
+  border-color: #718096;
+  color: var(--text-primary);
+}
+
+body.dark ::-webkit-scrollbar-track {
+  background: var(--surface-color);
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}

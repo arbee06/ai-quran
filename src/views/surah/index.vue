@@ -1,111 +1,72 @@
 <template>
   <div class="surah-view">
-    <!-- Modern Floating Header -->
-    <header class="floating-header">
-      <div class="header-container">
-        <div class="header-content">
-          <button @click="$router.back()" class="modern-back-btn">
-            <div class="btn-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <span>Back</span>
+    <!-- Navigation Header -->
+    <header class="header">
+      <div class="container">
+        <div class="nav-content">
+          <button @click="$router.push('/')" class="nav-home">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2"/>
+              <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Home
           </button>
           
-          <div class="header-title">
-            <h1>Surah Explorer</h1>
-            <p>Discover divine wisdom with AI guidance</p>
+          <div class="surah-nav">
+            <button @click="previousSurah" :disabled="id <= 1" class="nav-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+            
+            <div class="surah-info">
+              <h1>{{ surahInfo.name || 'Loading...' }}</h1>
+              <p>Surah {{ id }} • {{ surahInfo.englishName }}</p>
+            </div>
+            
+            <button @click="nextSurah" :disabled="id >= 114" class="nav-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
           </div>
           
-          <button @click="toggleVoiceAssistant" class="modern-voice-btn" :class="{ 'active': showVoiceAssistant }">
-            <div class="btn-icon">
-              <svg v-if="!showVoiceAssistant" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
-                <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
-                <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>
-              </svg>
-              <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
-              </svg>
-            </div>
-            <span>{{ showVoiceAssistant ? 'Text Chat' : 'AI Assistant' }}</span>
+          <button @click="showSettings = true" class="settings-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 1v6m0 6v6m6.364-15.364L15 7m-6 6l-3.364 3.364M23 12h-6m-6 0H1m6.364 6.364L11 15m6-6l3.364-3.364" stroke="currentColor" stroke-width="2"/>
+            </svg>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- Hero Background -->
-    <div class="hero-background">
-      <div class="gradient-overlay"></div>
-      <div class="pattern-overlay"></div>
-    </div>
 
-    <!-- Main Content -->
-    <main class="main-container">
-      <div class="content-wrapper">
-        <!-- Modern Surah Viewer Card -->
-        <div class="surah-card">
-          <div class="card-header">
-            <div class="surah-info">
-              <div class="surah-badge">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  <path d="M6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <span>Surah {{ id }}</span>
-              </div>
-              <!-- <div class="reading-progress">
-                <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: readingProgress + '%' }"></div>
-                </div>
-                <span class="progress-text">{{ Math.round(readingProgress) }}% read</span>
-              </div> -->
-            </div>
-          </div>
-          
-          <div class="card-content">
-            <SurahViewer 
-              :surah-id="id" 
-              @verse-selected="handleVerseSelected"
-              @ask-ai="handleAskAI"
-              @error="handleError"
-              @message="handleMessage"
-              @reading-progress="updateReadingProgress"
-            />
-          </div>
+    <!-- Surah Content Section -->
+    <section class="content-section" ref="contentSection">
+      <div class="container">
+        <div class="section-header">
+          <h2>{{ surahInfo.name || 'Surah' }} - {{ surahInfo.englishName || 'The Holy Quran' }}</h2>
+          <p>{{ surahInfo.revelationType || 'Meccan' }} • {{ surahInfo.numberOfAyahs || totalVerses }} verses</p>
         </div>
-      </div>
-    </main>
-
-    <!-- Modern Floating AI Assistant -->
-    <Transition name="ai-assistant">
-      <div v-if="showVoiceAssistant" class="ai-assistant-float">
-        <div class="assistant-card">
-          <div class="assistant-header">
-            <div class="assistant-info">
-              <div class="ai-avatar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
-                </svg>
-              </div>
-              <div class="assistant-details">
-                <h3>AI Assistant</h3>
-                <div class="status-indicator">
-                  <div class="status-dot"></div>
-                  <span>Online & Ready</span>
-                </div>
-              </div>
-            </div>
-            <div class="assistant-controls">
-              <button @click="minimizeAssistant" class="control-btn" :class="{ 'active': isMinimized }">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </button>
-              <button @click="toggleVoiceAssistant" class="control-btn close">
+        
+        <!-- Controls -->
+        <div class="content-controls">
+          <div class="search-container" v-if="showSearch">
+            <div class="search-bar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="search-icon">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <input 
+                v-model="searchQuery" 
+                type="text" 
+                placeholder="Search in this surah..."
+                class="search-input"
+                @keyup.enter="performSearch"
+                ref="searchInput"
+              >
+              <button @click="showSearch = false" class="search-close">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
@@ -113,117 +74,340 @@
             </div>
           </div>
           
-          <div v-if="!isMinimized" class="assistant-content">
-            <VoiceAssistant 
-              ref="voiceAssistant"
-              :current-surah-id="id"
-              @navigate-to-surah="handleNavigateToSurah"
-              @navigate-to-verse="handleNavigateToVerse"
-              @navigate-to-page="handleNavigateToPage"
-              @play-recitation="handlePlayRecitation"
-              @bookmark-verse="handleBookmarkVerse"
-              @toggle-theme="handleToggleTheme"
-            />
-          </div>
-        </div>
-      </div>
-    </Transition>
-    
-    <!-- Modern Text Chat Panel -->
-    <Transition name="text-chat">
-      <div v-if="!showVoiceAssistant && aiContext" class="text-chat-float">
-        <div class="chat-card">
-          <div class="chat-header">
-            <div class="chat-info">
-              <div class="chat-avatar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
-                </svg>
-              </div>
-              <div class="chat-details">
-                <h3>AI Text Chat</h3>
-                <p>Discussing verse {{ aiContext.verseNumber }}</p>
-              </div>
-            </div>
-            <button @click="aiContext = null" class="control-btn close">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <div class="view-controls">
+            <button @click="showSearch = !showSearch" class="control-btn" :class="{ active: showSearch }">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
+              Search
+            </button>
+            
+            <button @click="showBookmarks = true" class="control-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Bookmarks
+            </button>
+            
+            <button @click="playAudio" class="control-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <polygon points="5,3 19,12 5,21" fill="currentColor"/>
+              </svg>
+              Listen
             </button>
           </div>
+        </div>
+
+        <!-- Inline Surah Content -->
+        <div class="surah-content">
+          <div v-if="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading verses...</p>
+          </div>
           
-          <div class="chat-content">
-            <AIChat 
-              ref="aiChat"
-              :initial-context="aiContext"
-            />
+          <div v-else class="verses-container">
+            <div 
+              v-for="verse in filteredVerses" 
+              :key="verse.number"
+              class="verse-item"
+              :class="{ 'selected': selectedVerse === verse.number }"
+              @click="selectVerse(verse)"
+            >
+              <div class="verse-number">{{ verse.number }}</div>
+              <div class="verse-content">
+                <p class="arabic-text" dir="rtl" :style="{ fontSize: fontSize + 'px' }">{{ verse.text }}</p>
+                <p v-if="showTranslation" class="translation">{{ verse.translation }}</p>
+                <p v-if="showTransliteration" class="transliteration">{{ verse.transliteration }}</p>
+              </div>
+              <div class="verse-actions">
+                <button @click.stop="askAI(verse)" class="verse-btn" title="Ask AI">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </button>
+                <button @click.stop="copyVerse(verse)" class="verse-btn" title="Copy">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </button>
+                <button @click.stop="bookmarkVerse(verse)" class="verse-btn" title="Bookmark">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </Transition>
+    </section>
 
-    <!-- Modern Notification Toast -->
-    <Transition name="notification-slide">
-      <div v-if="notification" class="notification-toast" :class="notification.type">
-        <div class="toast-content">
-          <div class="toast-icon">
-            <svg v-if="notification.type === 'success'" width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <svg v-else-if="notification.type === 'error'" width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-              <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
-              <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-              <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
-              <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2"/>
-            </svg>
+    <!-- Voice Assistant Modal -->
+    <div v-if="showVoiceAssistant" class="modal-overlay" @click.self="closeVoiceAssistant">
+      <div class="modal-content voice-modal">
+        <div class="modal-header">
+          <div class="modal-title">
+            <div class="modal-icon voice">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Voice Assistant</h3>
+              <p>Speak naturally to interact</p>
+            </div>
           </div>
-          <div class="toast-message">
-            <span>{{ notification.message }}</span>
-          </div>
-          <button @click="dismissNotification" class="toast-dismiss">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <button @click="closeVoiceAssistant" class="modal-close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </button>
         </div>
-        <div class="toast-progress">
-          <div class="progress-bar" :style="{ animation: `toast-progress ${notificationDuration}ms linear` }"></div>
+        
+        <div class="modal-body">
+          <VoiceAssistant 
+            ref="voiceAssistant"
+            :current-surah-id="id"
+            @navigate-to-surah="handleNavigateToSurah"
+            @navigate-to-verse="handleNavigateToVerse"
+            @close="closeVoiceAssistant"
+          />
         </div>
       </div>
-    </Transition>
+    </div>
 
-    <!-- Floating Action Buttons -->
-    <div class="floating-actions">
-      <button @click="scrollToTop" class="fab scroll-top" v-show="showScrollTop">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M7 14l5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
+    <!-- AI Chat Widget -->
+    <div v-if="showAIChat" class="ai-chat-widget" :class="{ 'expanded': aiWidgetExpanded }">
+      <div class="ai-widget-header" @click="toggleAiWidget">
+        <div class="ai-header-content">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="ai-icon">
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 1-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 1 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 1 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 1-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456z" fill="currentColor"/>
+          </svg>
+          <h4>AI Assistant</h4>
+        </div>
+        <button class="ai-toggle-btn">
+          <span>{{ aiWidgetExpanded ? '−' : '+' }}</span>
+        </button>
+      </div>
+
+      <div v-if="aiWidgetExpanded" class="ai-widget-body">
+        <!-- API Key Setup -->
+        <div v-if="!aiApiKeySet" class="ai-api-key-prompt">
+          <p>Enter your OpenAI API key:</p>
+          <div class="ai-key-input-group">
+            <input 
+              v-model="aiApiKey" 
+              type="password" 
+              placeholder="sk-..."
+              class="ai-key-input"
+              @keyup.enter="setAiApiKey"
+            >
+            <button @click="setAiApiKey" class="ai-key-btn">Set</button>
+          </div>
+        </div>
+
+        <!-- Chat Content -->
+        <div v-else class="ai-chat-content">
+          <div v-if="aiContext" class="ai-context-display">
+            <small>{{ aiContext.surahName }} 
+              <span v-if="aiContext.verse">• Verse {{ aiContext.verse }}</span>
+            </small>
+          </div>
+
+          <div class="ai-messages-container" ref="aiMessagesContainer">
+            <div 
+              v-for="(message, index) in aiMessages" 
+              :key="index"
+              class="ai-message"
+              :class="message.type"
+            >
+              <div class="ai-message-content">{{ message.content }}</div>
+              <div class="ai-message-time">{{ formatAiTime(message.timestamp) }}</div>
+            </div>
+            <div v-if="aiIsLoading" class="ai-message assistant loading">
+              <div class="ai-typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-chat-input">
+            <textarea 
+              v-model="aiUserInput" 
+              @keyup.enter.ctrl="sendAiMessage"
+              placeholder="Ask about this verse..."
+              class="ai-message-input"
+              :disabled="aiIsLoading"
+              rows="2"
+            ></textarea>
+            <button 
+              @click="sendAiMessage" 
+              class="ai-send-btn"
+              :disabled="!aiUserInput.trim() || aiIsLoading"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="ai-quick-actions">
+            <button @click="askForExplanation" class="ai-quick-btn">Explain</button>
+            <button @click="askForContext" class="ai-quick-btn">Context</button>
+            <button @click="askForApplication" class="ai-quick-btn">Apply</button>
+          </div>
+        </div>
+      </div>
       
-      <button @click="toggleBookmarks" class="fab bookmarks">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
+      <button @click="closeAIChat" class="ai-close-btn" v-if="aiWidgetExpanded">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
+    </div>
+
+    <!-- Settings Panel -->
+    <div v-if="showSettings" class="panel-overlay" @click.self="closeSettings">
+      <div class="panel-content settings-panel">
+        <div class="panel-header">
+          <h3>Reading Settings</h3>
+          <button @click="closeSettings" class="panel-close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="panel-body">
+          <div class="setting-group">
+            <label>Font Size</label>
+            <div class="font-controls">
+              <button @click="decreaseFontSize" class="font-btn">A-</button>
+              <span class="font-size">{{ fontSize }}px</span>
+              <button @click="increaseFontSize" class="font-btn">A+</button>
+            </div>
+          </div>
+          
+          <div class="setting-group">
+            <label>Translation</label>
+            <select v-model="selectedTranslation" class="setting-select">
+              <option value="en">English - Sahih International</option>
+              <option value="ur">Urdu - Maulana Maududi</option>
+              <option value="bn">Bengali - Muhiuddin Khan</option>
+            </select>
+          </div>
+          
+          <div class="setting-group">
+            <label>Display Options</label>
+            <div class="toggle-options">
+              <label class="toggle-option">
+                <input type="checkbox" v-model="showTransliteration">
+                <span>Show Transliteration</span>
+              </label>
+              <label class="toggle-option">
+                <input type="checkbox" v-model="showWordByWord">
+                <span>Word by Word Translation</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookmarks Panel -->
+    <div v-if="showBookmarks" class="panel-overlay" @click.self="closeBookmarks">
+      <div class="panel-content bookmarks-panel">
+        <div class="panel-header">
+          <h3>Bookmarks</h3>
+          <button @click="closeBookmarks" class="panel-close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="panel-body">
+          <div v-if="bookmarksList.length === 0" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <p>No bookmarks yet</p>
+            <span>Bookmark verses to access them quickly</span>
+          </div>
+          
+          <div v-else class="bookmarks-list">
+            <div 
+              v-for="bookmark in bookmarksList" 
+              :key="bookmark.id"
+              class="bookmark-item"
+              @click="goToBookmark(bookmark)"
+            >
+              <div class="bookmark-info">
+                <h4>Surah {{ bookmark.surah_number }}, Verse {{ bookmark.verse_number }}</h4>
+                <p>{{ bookmark.note || bookmark.verseText?.substring(0, 100) + '...' }}</p>
+                <span class="bookmark-date">{{ formatDate(bookmark.timestamp) }}</span>
+              </div>
+              <button @click.stop="deleteBookmark(bookmark.id)" class="bookmark-delete">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Actions -->
+    <div class="floating-actions">
+      <button @click="showVoiceAssistant = true" class="fab voice-fab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container">
+      <div 
+        v-for="toast in toasts" 
+        :key="toast.id"
+        class="toast"
+        :class="toast.type"
+      >
+        <div class="toast-icon">
+          <svg v-if="toast.type === 'success'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <svg v-else-if="toast.type === 'error'" width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <span>{{ toast.message }}</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import SurahViewer from '../../components/surah/SurahViewer.vue'
-import AIChat from '../../components/ai/AIChat.vue'
 import VoiceAssistant from '../../components/ai/VoiceAssistant.vue'
+import surahService from '../../services/surahService'
+import openaiService from '../../services/openaiService'
 
 export default {
   name: 'SurahView',
   components: {
-    SurahViewer,
-    AIChat,
     VoiceAssistant
   },
   props: {
@@ -234,1050 +418,1626 @@ export default {
   },
   data() {
     return {
-      aiContext: null,
-      notification: null,
+      surahInfo: {},
+      verses: [],
+      loading: true,
+      selectedVerse: null,
+      viewMode: 'reading',
+      searchQuery: '',
+      showSearch: false,
+      showSettings: false,
+      showBookmarks: false,
       showVoiceAssistant: false,
-      isMinimized: false,
-      notificationTimeout: null,
-      notificationDuration: 4000,
+      showAIChat: false,
+      aiContext: null,
       readingProgress: 0,
-      showScrollTop: false
+      currentVerse: 1,
+      totalVerses: 0,
+      bookmarksList: [],
+      toasts: [],
+      
+      // AI Chat data
+      aiApiKey: '',
+      aiApiKeySet: false,
+      aiMessages: [],
+      aiUserInput: '',
+      aiIsLoading: false,
+      aiWidgetExpanded: false,
+      
+      // Settings
+      fontSize: 18,
+      selectedTranslation: 'en',
+      showTransliteration: false,
+      showWordByWord: false,
+      showTranslation: true
     }
   },
-  mounted() {
-    window.addEventListener('scroll', this.handleScroll)
-  },
-  beforeUnmount() {
-    if (this.notificationTimeout) {
-      clearTimeout(this.notificationTimeout)
+  computed: {
+    filteredVerses() {
+      if (!this.verses || !Array.isArray(this.verses)) return []
+      if (!this.searchQuery) return this.verses
+      
+      const query = this.searchQuery.toLowerCase()
+      return this.verses.filter(verse => 
+        (verse.text && verse.text.includes(this.searchQuery)) ||
+        (verse.translation && verse.translation.toLowerCase().includes(query))
+      )
     }
-    window.removeEventListener('scroll', this.handleScroll)
+  },
+  async mounted() {
+    this.loadSettings()
+    this.loadBookmarks()
+    this.loadAiApiKey()
+    await this.loadSurah()
+  },
+  watch: {
+    id: {
+      immediate: true,
+      async handler() {
+        await this.loadSurah()
+      }
+    }
   },
   methods: {
-    toggleVoiceAssistant() {
-      this.showVoiceAssistant = !this.showVoiceAssistant
-      this.isMinimized = false
-      
-      // Haptic feedback
-      if ('vibrate' in navigator) {
-        navigator.vibrate(50)
+    // Navigation
+    previousSurah() {
+      if (this.id > 1) {
+        this.$router.push(`/surah/${parseInt(this.id) - 1}`)
       }
     },
     
-    minimizeAssistant() {
-      this.isMinimized = !this.isMinimized
+    nextSurah() {
+      if (this.id < 114) {
+        this.$router.push(`/surah/${parseInt(this.id) + 1}`)
+      }
     },
     
-    handleScroll() {
-      this.showScrollTop = window.scrollY > 400
-    },
-    
-    scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+    scrollToContent() {
+      this.$refs.contentSection?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
       })
     },
     
-    toggleBookmarks() {
-      this.showNotification('Bookmarks panel coming soon!', 'info')
+    // Modals & Panels
+    closeVoiceAssistant() {
+      this.showVoiceAssistant = false
     },
     
-    updateReadingProgress(progress) {
-      this.readingProgress = progress
+    closeAIChat() {
+      this.showAIChat = false
+      this.aiWidgetExpanded = false
     },
     
-    handleVerseSelected({ surah, verse }) {
-      this.aiContext = {
-        surahName: surah.name,
-        verseNumber: verse.number,
-        verseText: verse.text,
-        verse: verse.number
+    toggleAiWidget() {
+      this.aiWidgetExpanded = !this.aiWidgetExpanded
+    },
+    
+    closeSettings() {
+      this.showSettings = false
+      this.saveSettings()
+    },
+    
+    closeBookmarks() {
+      this.showBookmarks = false
+    },
+    
+    // Settings
+    loadSettings() {
+      this.fontSize = parseInt(localStorage.getItem('fontSize') || '18')
+      this.selectedTranslation = localStorage.getItem('translation') || 'en'
+      this.showTransliteration = localStorage.getItem('showTransliteration') === 'true'
+      this.showWordByWord = localStorage.getItem('showWordByWord') === 'true'
+    },
+    
+    saveSettings() {
+      localStorage.setItem('fontSize', this.fontSize)
+      localStorage.setItem('translation', this.selectedTranslation)
+      localStorage.setItem('showTransliteration', this.showTransliteration)
+      localStorage.setItem('showWordByWord', this.showWordByWord)
+    },
+    
+    increaseFontSize() {
+      if (this.fontSize < 32) {
+        this.fontSize += 2
+        this.saveSettings()
       }
     },
     
-    handleAskAI({ surah, verse }) {
-      this.aiContext = {
-        surahName: surah.name,
-        verseNumber: verse.number,
-        verseText: verse.text,
-        verse: verse.number
-      }
-      
-      if (!this.showVoiceAssistant && this.$refs.aiChat) {
-        this.$refs.aiChat.setContext(this.aiContext)
+    decreaseFontSize() {
+      if (this.fontSize > 12) {
+        this.fontSize -= 2
+        this.saveSettings()
       }
     },
     
+    // Search
+    performSearch() {
+      if (this.searchQuery.trim()) {
+        this.showToast(`Searching for "${this.searchQuery}"...`, 'info')
+      }
+    },
+    
+    // Audio
+    playAudio() {
+      this.showToast('Audio playback coming soon', 'info')
+    },
+    
+    // Navigation handlers
     handleNavigateToSurah(surahId) {
       this.$router.push(`/surah/${surahId}`)
-      this.showNotification(`Navigating to Surah ${surahId}`, 'info')
     },
     
     handleNavigateToVerse({ surah_number, verse_number }) {
       if (surah_number != this.id) {
         this.$router.push(`/surah/${surah_number}`)
       }
-      
-      this.$nextTick(() => {
-        const verseElement = document.querySelector(`[data-verse="${verse_number}"]`)
-        if (verseElement) {
-          const yOffset = -120
-          const y = verseElement.getBoundingClientRect().top + window.pageYOffset + yOffset
-          
-          window.scrollTo({
-            top: y,
-            behavior: 'smooth'
-          })
-          
-          verseElement.classList.add('highlighted-verse')
-          setTimeout(() => {
-            verseElement.classList.remove('highlighted-verse')
-          }, 4000)
+      // Scroll to verse logic here
+    },
+    
+    // Bookmarks
+    loadBookmarks() {
+      this.bookmarksList = JSON.parse(localStorage.getItem('quran_bookmarks') || '[]')
+    },
+    
+    goToBookmark(bookmark) {
+      this.handleNavigateToVerse({
+        surah_number: bookmark.surah_number,
+        verse_number: bookmark.verse_number
+      })
+      this.showBookmarks = false
+    },
+    
+    deleteBookmark(id) {
+      this.bookmarksList = this.bookmarksList.filter(b => b.id !== id)
+      localStorage.setItem('quran_bookmarks', JSON.stringify(this.bookmarksList))
+      this.showToast('Bookmark removed', 'info')
+    },
+    
+    formatDate(timestamp) {
+      return new Date(timestamp).toLocaleDateString()
+    },
+    
+    // Surah loading
+    async loadSurah() {
+      this.loading = true
+      try {
+        const surah = await surahService.getSurahById(this.id)
+        const content = await surahService.getSurahContent(this.id)
+        
+        this.surahInfo = {
+          name: surah.name,
+          englishName: surah.englishName,
+          numberOfAyahs: surah.verses,
+          revelationType: surah.type
         }
+        
+        this.verses = content?.verses || []
+        this.totalVerses = this.verses.length
+        
+        // If surah data is missing, try to get it from content
+        if (!surah.name && content) {
+          this.surahInfo.name = content.name || `Surah ${this.id}`
+          this.surahInfo.englishName = content.englishName || `Chapter ${this.id}`
+        }
+      } catch (error) {
+        console.error('Error loading surah:', error)
+        this.showToast('Failed to load Surah', 'error')
+        
+        // Set fallback data
+        this.surahInfo = {
+          name: `Surah ${this.id}`,
+          englishName: `Chapter ${this.id}`,
+          numberOfAyahs: 0,
+          revelationType: 'Unknown'
+        }
+        this.verses = []
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // Verse interactions
+    selectVerse(verse) {
+      this.selectedVerse = verse.number
+      this.currentVerse = verse.number
+    },
+    
+    askAI(verse) {
+      this.aiContext = {
+        surahName: this.surahInfo.name,
+        verseNumber: verse.number,
+        verseText: verse.text,
+        verse: verse.number
+      }
+      this.showAIChat = true
+      this.aiWidgetExpanded = true
+    },
+    
+    copyVerse(verse) {
+      const text = `${verse.text}\n\n${verse.translation}\n\nSurah ${this.surahInfo.englishName}, Verse ${verse.number}`
+      navigator.clipboard.writeText(text).then(() => {
+        this.showToast('Verse copied to clipboard', 'success')
+      })
+    },
+    
+    bookmarkVerse(verse) {
+      const bookmark = {
+        id: Date.now(),
+        surah_number: this.id,
+        verse_number: verse.number,
+        verseText: verse.text,
+        translation: verse.translation,
+        timestamp: Date.now()
+      }
+      
+      this.bookmarksList.push(bookmark)
+      localStorage.setItem('quran_bookmarks', JSON.stringify(this.bookmarksList))
+      this.showToast('Verse bookmarked', 'success')
+    },
+    
+    // AI Chat methods
+    loadAiApiKey() {
+      const savedApiKey = localStorage.getItem('openai_api_key')
+      if (savedApiKey) {
+        this.aiApiKey = savedApiKey
+        this.setAiApiKey()
+      }
+    },
+    
+    setAiApiKey() {
+      if (this.aiApiKey.trim()) {
+        try {
+          openaiService.initialize(this.aiApiKey)
+          this.aiApiKeySet = true
+          localStorage.setItem('openai_api_key', this.aiApiKey)
+          this.addAiMessage('system', 'AI Assistant ready! Ask me anything about the Quran.')
+        } catch (error) {
+          this.showToast('Invalid API key. Please check and try again.', 'error')
+        }
+      }
+    },
+    
+    async sendAiMessage() {
+      if (!this.aiUserInput.trim() || this.aiIsLoading) return
+      
+      const userMessage = this.aiUserInput.trim()
+      this.addAiMessage('user', userMessage)
+      this.aiUserInput = ''
+      this.aiIsLoading = true
+      
+      try {
+        let response
+        if (this.aiContext && this.aiContext.verseText) {
+          response = await openaiService.askAboutSurah(
+            this.aiContext.verseText,
+            userMessage,
+            {
+              surahName: this.aiContext.surahName,
+              verse: this.aiContext.verseNumber
+            }
+          )
+        } else {
+          response = await openaiService.askAboutSurah(
+            '',
+            userMessage,
+            { surahName: 'General Question' }
+          )
+        }
+        
+        this.addAiMessage('assistant', response)
+      } catch (error) {
+        this.addAiMessage('error', 'Sorry, I encountered an error. Please try again.')
+        console.error('AI Error:', error)
+      } finally {
+        this.aiIsLoading = false
+      }
+    },
+    
+    async askForExplanation() {
+      if (!this.aiContext || !this.aiContext.verseText) {
+        this.addAiMessage('error', 'Please select a verse first.')
+        return
+      }
+      
+      this.aiUserInput = 'Please explain this verse in detail.'
+      await this.sendAiMessage()
+    },
+    
+    async askForContext() {
+      if (!this.aiContext || !this.aiContext.verseText) {
+        this.addAiMessage('error', 'Please select a verse first.')
+        return
+      }
+      
+      this.aiUserInput = 'What is the historical context and reason for revelation of this verse?'
+      await this.sendAiMessage()
+    },
+    
+    async askForApplication() {
+      if (!this.aiContext || !this.aiContext.verseText) {
+        this.addAiMessage('error', 'Please select a verse first.')
+        return
+      }
+      
+      this.aiUserInput = 'How can we apply the teachings of this verse in modern daily life?'
+      await this.sendAiMessage()
+    },
+    
+    addAiMessage(type, content) {
+      this.aiMessages.push({
+        type,
+        content,
+        timestamp: new Date()
       })
       
-      this.showNotification(`Navigating to Surah ${surah_number}, verse ${verse_number}`, 'info')
+      this.$nextTick(() => {
+        this.scrollAiToBottom()
+      })
     },
     
-    handleNavigateToPage({ page_number }) {
-      this.showNotification(`Page navigation coming soon - Page ${page_number}`, 'info')
-    },
-    
-    handlePlayRecitation({ surah_id, verse_number, reciter }) {
-      const message = verse_number 
-        ? `Playing verse ${verse_number} of Surah ${surah_id}${reciter ? ` by ${reciter}` : ''}`
-        : `Playing Surah ${surah_id}${reciter ? ` by ${reciter}` : ''}`
-      this.showNotification(message, 'success')
-    },
-    
-    handleBookmarkVerse({ surah_id, verse_number, note }) {
-      try {
-        const bookmarks = JSON.parse(localStorage.getItem('quran_bookmarks') || '[]')
-        const bookmark = {
-          surah_id,
-          verse_number,
-          note,
-          timestamp: new Date().toISOString(),
-          id: Date.now()
-        }
-        bookmarks.push(bookmark)
-        localStorage.setItem('quran_bookmarks', JSON.stringify(bookmarks))
-        
-        this.showNotification(`Verse ${verse_number} bookmarked successfully`, 'success')
-      } catch (error) {
-        console.error('Error saving bookmark:', error)
-        this.showNotification('Failed to save bookmark', 'error')
+    scrollAiToBottom() {
+      const container = this.$refs.aiMessagesContainer
+      if (container) {
+        container.scrollTop = container.scrollHeight
       }
     },
     
-    handleToggleTheme() {
-      this.$emit('toggle-theme')
-      this.showNotification('Theme toggled', 'info')
+    formatAiTime(date) {
+      return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      })
     },
     
-    handleError(message) {
-      this.showNotification(message, 'error')
-    },
-    
-    handleMessage(message) {
-      this.showNotification(message, 'success')
-    },
-    
-    showNotification(message, type = 'info') {
-      if (this.notificationTimeout) {
-        clearTimeout(this.notificationTimeout)
-      }
-      
-      this.notificationDuration = type === 'error' ? 6000 : type === 'success' ? 4000 : 5000
-      this.notification = { message, type }
-      
-      this.notificationTimeout = setTimeout(() => {
-        this.notification = null
-      }, this.notificationDuration)
-    },
-    
-    dismissNotification() {
-      if (this.notificationTimeout) {
-        clearTimeout(this.notificationTimeout)
-      }
-      this.notification = null
+    // Toast notifications
+    showToast(message, type = 'info') {
+      const id = Date.now()
+      this.toasts.push({ id, message, type })
+      setTimeout(() => {
+        this.toasts = this.toasts.filter(t => t.id !== id)
+      }, 4000)
     }
   }
 }
 </script>
 
 <style scoped>
-/* Modern CSS Variables */
-:root {
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-200: #bfdbfe;
-  --primary-300: #93c5fd;
-  --primary-500: #3b82f6;
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
-  --primary-800: #1e40af;
-  --primary-900: #1e3a8a;
-  
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
-  --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
-  --gray-400: #9ca3af;
-  --gray-500: #6b7280;
-  --gray-600: #4b5563;
-  --gray-700: #374151;
-  --gray-800: #1f2937;
-  --gray-900: #111827;
-  
-  --success-50: #ecfdf5;
-  --success-100: #d1fae5;
-  --success-300: #86efac;
-  --success-500: #10b981;
-  --success-700: #047857;
-  --success-800: #065f46;
-  
-  --error-50: #fef2f2;
-  --error-100: #fee2e2;
-  --error-300: #fca5a5;
-  --error-500: #ef4444;
-  --error-700: #b91c1c;
-  --error-800: #991b1b;
-  
-  --warning-50: #fffbeb;
-  --warning-500: #f59e0b;
-  --warning-700: #b45309;
-  
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-secondary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-error: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  
-  --radius-sm: 0.375rem;
-  --radius: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
-  --radius-3xl: 3rem;
-  
-  --blur: blur(16px);
-  --backdrop: saturate(180%) blur(20px);
+/* Base styles matching your home page */
+* {
+  box-sizing: border-box;
 }
 
-/* Base Styles */
 .surah-view {
   min-height: 100vh;
-  background: linear-gradient(to bottom, var(--gray-50), white);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Hero Background */
-.hero-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 300px;
-  z-index: -1;
-  overflow: hidden;
-}
-
-.gradient-overlay {
-  position: absolute;
-  inset: 0;
-  background: var(--gradient-primary);
-  opacity: 0.1;
-}
-
-.pattern-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.15) 1px, transparent 0);
-  background-size: 24px 24px;
-  opacity: 0.5;
-}
-
-/* Modern Floating Header */
-.floating-header {
-  position: sticky;
-  top: 1rem;
-  z-index: 40;
-  padding: 0 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.header-container {
+.container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
-.header-content {
+/* Header */
+.header {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: var(--backdrop);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
-  padding: 1.25rem 2rem;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.nav-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-xl);
+  gap: 2rem;
 }
 
-.modern-back-btn {
-  display: inline-flex;
+.nav-home {
+  display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  background: var(--gray-100);
-  border: none;
-  border-radius: var(--radius-xl);
-  color: var(--gray-700);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  color: #1f2937;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.9375rem;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
 }
 
-.modern-back-btn:hover {
-  background: var(--gray-200);
-  color: var(--gray-900);
-  transform: translateX(-4px);
+.nav-home:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.btn-icon {
+.surah-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-arrow {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
-}
-
-.modern-back-btn:hover .btn-icon {
-  transform: translateX(-2px);
-}
-
-.header-title {
-  text-align: center;
-  flex: 1;
-  margin: 0 2rem;
-}
-
-.header-title h1 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--gray-900);
-  letter-spacing: -0.02em;
-}
-
-.header-title p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--gray-600);
-}
-
-.modern-voice-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  background: var(--gradient-primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-xl);
-  font-weight: 600;
   cursor: pointer;
+  color: #1f2937;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-lg);
-  font-size: 0.9375rem;
+  backdrop-filter: blur(10px);
 }
 
-.modern-voice-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
+.nav-arrow:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #667eea;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
-.modern-voice-btn.active {
-  background: var(--gradient-secondary);
-}
-
-/* Main Container */
-.main-container {
-  padding: 0 1.5rem 4rem;
-  position: relative;
-  z-index: 1;
-}
-
-.content-wrapper {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-/* Modern Surah Card */
-.surah-card {
-  background: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-3xl);
-  box-shadow: var(--shadow-2xl);
-  overflow: hidden;
-  backdrop-filter: var(--backdrop);
-}
-
-.card-header {
-  background: linear-gradient(135deg, var(--gray-50) 0%, rgba(255, 255, 255, 0.8) 100%);
-  padding: 2rem;
-  border-bottom: 1px solid var(--gray-200);
+.nav-arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .surah-info {
+  text-align: center;
+  min-width: 200px;
+}
+
+.surah-info h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1f2937;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, #1f2937 0%, #4b5563 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.surah-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.settings-btn {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1f2937;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.settings-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #667eea;
+  transform: translateY(-2px) scale(1.05) rotate(180deg);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Content Section */
+.content-section {
+  padding: 2rem 0 6rem;
+  background: white;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.section-header p {
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+.content-controls {
+  margin-bottom: 2rem;
+  display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-.surah-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: var(--radius-xl);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  box-shadow: var(--shadow-md);
+.search-container {
+  flex: 1;
+  max-width: 400px;
 }
 
-.reading-progress {
+.search-bar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-}
-
-.progress-bar {
-  width: 200px;
-  height: 8px;
-  background: var(--gray-200);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--gradient-primary);
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.progress-text {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--gray-600);
-  white-space: nowrap;
-}
-
-.card-content {
-  padding: 0;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
   background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
-/* Modern AI Assistant Float */
-.ai-assistant-float {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 50;
-  width: 420px;
-  max-width: calc(100vw - 2rem);
-  max-height: calc(100vh - 8rem);
+.search-icon {
+  color: #9ca3af;
 }
 
-.assistant-card {
-  background: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-2xl);
-  backdrop-filter: var(--backdrop);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 600px;
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: #111827;
 }
 
-.assistant-header {
-  background: var(--gradient-primary);
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-  flex-shrink: 0;
-}
-
-.assistant-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.ai-avatar {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.2);
+.search-close {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  cursor: pointer;
+  color: #9ca3af;
+  transition: all 0.2s ease;
 }
 
-.assistant-details h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.125rem;
-  font-weight: 700;
+.search-close:hover {
+  background: #f3f4f6;
+  color: #374151;
 }
 
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  background: #4ade80;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.assistant-controls {
+.view-controls {
   display: flex;
   gap: 0.5rem;
 }
 
 .control-btn {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 50%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.5rem;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  color: white;
   transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  background: #f3f4f6;
+  border-color: #6366f1;
+  color: #6366f1;
 }
 
-.control-btn.close:hover {
-  background: rgba(239, 68, 68, 0.8);
+.control-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
 }
 
-.assistant-content {
-  flex: 1;
-  overflow: hidden;
+.surah-content {
   background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e1e5e9;
+  border-top: 3px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.verses-container {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+.verse-item {
+  display: flex;
+  gap: 1rem;
   padding: 1.5rem;
+  background: #f9fafb;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Force VoiceAssistant component to fill remaining space */
-.assistant-content > * {
+.verse-item:hover {
+  background: white;
+  border-color: #6366f1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.verse-item.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.verse-number {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.verse-content {
   flex: 1;
-  width: 100%;
-  height: 100%;
+}
+
+.arabic-text {
+  font-family: 'Amiri', 'Scheherazade New', serif;
+  font-size: 1.5rem;
+  line-height: 2;
+  color: #111827;
+  margin: 0 0 1rem 0;
+  text-align: right;
+  direction: rtl;
+}
+
+.translation {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #374151;
+  margin: 0 0 0.5rem 0;
+  font-style: italic;
+}
+
+.transliteration {
+  font-size: 0.875rem;
+  color: #6b7280;
   margin: 0;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-lg);
+  font-style: italic;
+}
+
+.verse-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-self: flex-start;
+}
+
+.verse-btn {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.verse-btn:hover {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Modals & Panels */
+.modal-overlay,
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1.5rem;
+  width: 90%;
+  max-width: 700px;
+  max-height: 85vh;
   overflow: hidden;
-  background: transparent;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* VoiceAssistant specific styling */
-.ai-assistant-float .voice-assistant {
-  flex: 1 !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: var(--radius-lg) !important;
-  background: transparent !important;
-  display: flex !important;
-  flex-direction: column !important;
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Modern Text Chat Float */
-.text-chat-float {
+.voice-modal {
+  max-width: 900px;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  color: white;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* AI Chat Widget */
+.ai-chat-widget {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
+  width: 400px;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 50;
-  width: 420px;
-  max-width: calc(100vw - 2rem);
-  height: 600px;
-  max-height: calc(100vh - 8rem);
+  overflow: hidden;
 }
 
-.chat-card {
+.ai-chat-widget:not(.expanded) {
+  height: 60px;
+}
+
+.ai-chat-widget.expanded {
+  height: 600px;
+}
+
+.panel-content {
   background: white;
+  width: 400px;
+  max-width: 90vw;
+  height: 100vh;
+  margin-left: auto;
+  box-shadow: -10px 0 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header,
+.panel-header {
+  padding: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+}
+
+.voice-modal .modal-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(51, 65, 85, 0.6));
+  backdrop-filter: blur(20px);
+}
+
+.ai-widget-header {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 1rem 1rem 0 0;
+}
+
+.ai-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ai-header-content h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ai-toggle-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ai-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-2xl);
-  backdrop-filter: var(--backdrop);
+  position: relative;
   overflow: hidden;
+}
+
+.modal-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.modal-icon.voice {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.3));
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.modal-icon.ai {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.3));
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.modal-title h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: inherit;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modal-title p {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  opacity: 0.9;
+}
+
+.voice-modal .modal-title h3,
+.ai-modal .modal-title h3 {
+  color: white;
+}
+
+.voice-modal .modal-title p,
+.ai-modal .modal-title p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-close,
+.panel-close {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.modal-close:hover,
+.panel-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: white;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-body,
+.panel-body {
+  flex: 1;
+  overflow: auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.voice-modal .modal-body {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.4), rgba(51, 65, 85, 0.2));
+  backdrop-filter: blur(20px);
+  min-height: 500px;
+  padding: 2.5rem;
+}
+
+.ai-widget-body {
+  height: calc(100% - 60px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ai-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* AI Widget Styles */
+.ai-api-key-prompt {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.ai-api-key-prompt p {
+  color: #374151;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.ai-key-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ai-key-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  color: #374151;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.ai-key-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.ai-key-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
+}
+
+.ai-key-btn {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.ai-key-btn:hover {
+  background: #5a67d8;
+}
+
+.ai-chat-content {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.chat-header {
-  background: var(--gradient-secondary);
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-  flex-shrink: 0;
+.ai-context-display {
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #718096;
+  font-size: 0.75rem;
 }
 
-.chat-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.chat-avatar {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-}
-
-.chat-details h3 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-}
-
-.chat-details p {
-  margin: 0;
-  font-size: 0.875rem;
-  opacity: 0.9;
-}
-
-.chat-content {
+.ai-messages-container {
   flex: 1;
-  overflow: hidden;
-  background: white;
-  padding: 1.5rem;
-}
-
-/* Modern Notification Toast */
-.notification-toast {
-  position: fixed;
-  top: 2rem;
-  right: 2rem;
-  z-index: 60;
-  width: 400px;
-  max-width: calc(100vw - 2rem);
-  background: white;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-2xl);
-  overflow: hidden;
-  border: 1px solid var(--gray-200);
-}
-
-.toast-content {
+  overflow-y: auto;
+  padding: 1rem;
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.25rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
 }
 
-.toast-icon {
-  flex-shrink: 0;
+.ai-messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ai-messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-messages-container::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.ai-messages-container::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.ai-message {
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-message.user {
+  align-items: flex-end;
+}
+
+.ai-message.assistant {
+  align-items: flex-start;
+}
+
+.ai-message.system {
+  align-items: center;
+}
+
+.ai-message.error {
+  align-items: center;
+}
+
+.ai-message-content {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.ai-message.user .ai-message-content {
+  background: #667eea;
+  color: white;
+  border-bottom-right-radius: 0.25rem;
+  margin-left: auto;
+}
+
+.ai-message.assistant .ai-message-content {
+  background: #f7fafc;
+  color: #2d3748;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.ai-message.system .ai-message-content {
+  background: #f7fafc;
+  color: #718096;
+  font-style: italic;
+  text-align: center;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.ai-message.error .ai-message-content {
+  background: #fed7d7;
+  color: #c53030;
+  text-align: center;
+  border-radius: 0.5rem;
+}
+
+.ai-message-time {
+  font-size: 0.625rem;
+  color: #a0aec0;
+  margin-top: 0.25rem;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+.ai-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  background: #f7fafc;
+  border-radius: 1rem 1rem 1rem 0.25rem;
+}
+
+.ai-typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background: #718096;
+  border-radius: 50%;
+  animation: aiTyping 1.4s infinite ease-in-out;
+}
+
+.ai-typing-indicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.ai-typing-indicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes aiTyping {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ai-chat-input {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+}
+
+.ai-message-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.5rem;
+  color: #374151;
+  font-size: 0.875rem;
+  outline: none;
+  resize: none;
+  min-height: 40px;
+  max-height: 80px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ai-message-input::placeholder {
+  color: #9ca3af;
+}
+
+.ai-message-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.ai-send-btn {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  background: #667eea;
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -2px;
 }
 
-.notification-toast.success .toast-icon {
-  background: var(--success-100);
-  color: var(--success-700);
+.ai-send-btn:hover:not(:disabled) {
+  background: #5a67d8;
+}
+.ai-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.notification-toast.error .toast-icon {
-  background: var(--error-100);
-  color: var(--error-700);
+.ai-quick-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem 1rem;
+  flex-wrap: wrap;
 }
 
-.notification-toast.info .toast-icon {
-  background: var(--primary-100);
-  color: var(--primary-700);
-}
-
-.toast-message {
+.ai-quick-btn {
   flex: 1;
-  min-width: 0;
-}
-
-.toast-message span {
+  min-width: 80px;
+  padding: 0.5rem 0.75rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  color: #718096;
+  cursor: pointer;
+  font-size: 0.75rem;
   font-weight: 500;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: var(--gray-800);
+  transition: all 0.2s ease;
 }
 
-.toast-dismiss {
+.ai-quick-btn:hover {
+  background: #e2e8f0;
+  color: #374151;
+}
+
+/* Settings */
+.setting-group {
+  margin-bottom: 2rem;
+}
+
+.setting-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+.font-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.font-btn {
+  width: 36px;
+  height: 36px;
+  background: #f3f4f6;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.font-btn:hover {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+}
+
+.font-size {
+  min-width: 60px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.setting-select {
+  width: 100%;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.5rem;
+  color: #111827;
+  font-size: 0.9375rem;
+}
+
+.toggle-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.toggle-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+/* Bookmarks */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #9ca3af;
+}
+
+.empty-state svg {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+}
+
+.bookmarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bookmark-item {
+  background: #f9fafb;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.bookmark-item:hover {
+  border-color: #6366f1;
+  background: white;
+}
+
+.bookmark-info {
+  flex: 1;
+}
+
+.bookmark-info h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: #111827;
+}
+
+.bookmark-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+}
+
+.bookmark-date {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.bookmark-delete {
   width: 28px;
   height: 28px;
-  background: var(--gray-100);
+  background: transparent;
   border: none;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--gray-500);
+  color: #9ca3af;
   transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-top: 6px;
 }
 
-.toast-dismiss:hover {
-  background: var(--gray-200);
-  color: var(--gray-700);
-  transform: scale(1.05);
+.bookmark-delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
-.toast-progress {
-  height: 3px;
-  background: var(--gray-200);
-  overflow: hidden;
-}
-
-.toast-progress .progress-bar {
-  height: 100%;
-  background: var(--primary-500);
-  transform-origin: left;
-}
-
-@keyframes toast-progress {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
-}
-
-/* Floating Action Buttons */
+/* Floating Actions */
 .floating-actions {
   position: fixed;
   bottom: 2rem;
-  left: 2rem;
-  z-index: 45;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  right: 2rem;
+  z-index: 40;
 }
 
 .fab {
   width: 56px;
   height: 56px;
-  background: var(--gradient-primary);
-  border: none;
   border-radius: 50%;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: white;
-  box-shadow: var(--shadow-xl);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.voice-fab {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
 .fab:hover {
   transform: scale(1.1);
-  box-shadow: var(--shadow-2xl);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
 }
 
-.fab.scroll-top {
-  background: var(--gradient-secondary);
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.fab.bookmarks {
-  background: var(--gradient-success);
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
 }
 
-/* Highlighted Verse Animation */
-:global(.highlighted-verse) {
-  animation: verse-highlight 4s ease-in-out;
-  border-left: 4px solid var(--primary-500) !important;
-  background: linear-gradient(90deg, var(--primary-50) 0%, transparent 100%) !important;
-  border-radius: var(--radius-lg) !important;
-  padding-left: 1.5rem !important;
-  margin-left: -1.5rem !important;
-  box-shadow: var(--shadow-md) !important;
+.toast.success {
+  border-color: #86efac;
+  background: #f0fdf4;
 }
 
-@keyframes verse-highlight {
-  0% {
-    background: linear-gradient(90deg, var(--primary-100) 0%, var(--primary-50) 100%);
-    transform: scale(1.01);
-  }
-  25% {
-    background: linear-gradient(90deg, var(--primary-75) 0%, var(--primary-25) 100%);
-  }
-  75% {
-    background: linear-gradient(90deg, var(--primary-75) 0%, var(--primary-25) 100%);
-  }
-  100% {
-    background: linear-gradient(90deg, var(--primary-50) 0%, transparent 100%);
-    transform: scale(1);
-  }
+.toast.error {
+  border-color: #fca5a5;
+  background: #fef2f2;
 }
 
-/* Transitions */
-.ai-assistant-enter-active,
-.ai-assistant-leave-active,
-.text-chat-enter-active,
-.text-chat-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.toast.info {
+  border-color: #93c5fd;
+  background: #eff6ff;
 }
 
-.ai-assistant-enter-from,
-.ai-assistant-leave-to,
-.text-chat-enter-from,
-.text-chat-leave-to {
-  opacity: 0;
-  transform: translateY(30px) scale(0.9);
+.toast-icon {
+  flex-shrink: 0;
 }
 
-.notification-slide-enter-active,
-.notification-slide-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.toast.success .toast-icon { color: #16a34a; }
+.toast.error .toast-icon { color: #dc2626; }
+.toast.info .toast-icon { color: #2563eb; }
+
+.toast span {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-.notification-slide-enter-from,
-.notification-slide-leave-to {
-  opacity: 0;
-  transform: translateX(100%) scale(0.9);
-}
-
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
-  .floating-header {
-    top: 0.5rem;
-    padding: 0 1rem;
-    margin-bottom: 1rem;
-  }
-  
-  .header-content {
-    padding: 1rem 1.5rem;
+  .nav-content {
     flex-direction: column;
     gap: 1rem;
-    align-items: stretch;
   }
   
-  .header-title {
-    margin: 0;
-    text-align: center;
-  }
-  
-  .modern-back-btn,
-  .modern-voice-btn {
+  .surah-nav {
+    width: 100%;
     justify-content: center;
   }
   
-  .main-container {
-    padding: 0 1rem 3rem;
+  .hero-actions {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .card-header {
-    padding: 1.5rem;
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    max-width: 300px;
   }
   
-  .surah-info {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .content-controls {
     flex-direction: column;
     align-items: stretch;
-    text-align: center;
   }
   
-  .reading-progress {
-    justify-content: center;
-  }
-  
-  .ai-assistant-float,
-  .text-chat-float {
-    bottom: 1rem;
-    right: 1rem;
-    left: 1rem;
-    width: auto;
+  .search-container {
     max-width: none;
-    height: 500px;
+  }
+  
+  .panel-content {
+    width: 100%;
   }
   
   .floating-actions {
     bottom: 1rem;
-    left: 1rem;
-  }
-  
-  .notification-toast {
-    top: 1rem;
     right: 1rem;
-    left: 1rem;
-    width: auto;
-    max-width: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .floating-header {
-    top: 0.25rem;
-    padding: 0 0.75rem;
-  }
-  
-  .header-content {
-    padding: 0.875rem 1rem;
-    border-radius: var(--radius-xl);
-  }
-  
-  .header-title h1 {
-    font-size: 1.25rem;
-  }
-  
-  .main-container {
-    padding: 0 0.75rem 2rem;
-  }
-  
-  .surah-card {
-    border-radius: var(--radius-2xl);
-  }
-  
-  .card-header {
-    padding: 1rem;
-  }
-  
-  .progress-bar {
-    width: 150px;
-  }
-  
-  .ai-assistant-float,
-  .text-chat-float {
-    bottom: 0.75rem;
-    right: 0.75rem;
-    left: 0.75rem;
-    height: 450px;
-    border-radius: var(--radius-xl);
-  }
-  
-  .assistant-header,
-  .chat-header {
-    padding: 1rem;
-  }
-  
-  .assistant-content,
-  .chat-content {
-    padding: 1rem;
-  }
-  
-  .floating-actions {
-    bottom: 0.75rem;
-    left: 0.75rem;
   }
   
   .fab {
     width: 48px;
     height: 48px;
-  }
-  
-  .modern-back-btn span,
-  .modern-voice-btn span {
-    font-size: 0.875rem;
-  }
-}
-
-/* Performance Optimizations */
-.ai-assistant-float,
-.text-chat-float,
-.notification-toast,
-.floating-actions {
-  will-change: transform, opacity;
-}
-
-/* Focus States for Accessibility */
-.modern-back-btn:focus,
-.modern-voice-btn:focus,
-.control-btn:focus,
-.toast-dismiss:focus,
-.fab:focus {
-  outline: 2px solid var(--primary-500);
-  outline-offset: 2px;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --gray-50: #111827;
-    --gray-100: #1f2937;
-    --gray-200: #374151;
-    --gray-300: #4b5563;
-    --gray-400: #6b7280;
-    --gray-500: #9ca3af;
-    --gray-600: #d1d5db;
-    --gray-700: #e5e7eb;
-    --gray-800: #f3f4f6;
-    --gray-900: #f9fafb;
-  }
-  
-  .surah-view {
-    background: linear-gradient(to bottom, var(--gray-900), var(--gray-800));
-  }
-  
-  .header-content,
-  .surah-card,
-  .assistant-card,
-  .chat-card,
-  .notification-toast {
-    background: rgba(17, 24, 39, 0.95);
-    border-color: rgba(55, 65, 81, 0.8);
-  }
-  
-  .card-header {
-    background: linear-gradient(135deg, var(--gray-800) 0%, rgba(17, 24, 39, 0.8) 100%);
   }
 }
 </style>

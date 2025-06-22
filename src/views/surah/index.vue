@@ -181,16 +181,23 @@
 
     <!-- AI Chat Widget -->
     <div v-if="showAIChat" class="ai-chat-widget" :class="{ 'expanded': aiWidgetExpanded }">
-      <div class="ai-widget-header" @click="toggleAiWidget">
-        <div class="ai-header-content">
+      <div class="ai-widget-header">
+        <div class="ai-header-content" @click="toggleAiWidget">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="ai-icon">
             <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 1-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 1 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 1 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 1-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456z" fill="currentColor"/>
           </svg>
           <h4>AI Assistant</h4>
         </div>
-        <button class="ai-toggle-btn">
-          <span>{{ aiWidgetExpanded ? '−' : '+' }}</span>
-        </button>
+        <div class="ai-header-buttons">
+          <button @click="toggleAiWidget" class="ai-toggle-btn">
+            <span>{{ aiWidgetExpanded ? '−' : '+' }}</span>
+          </button>
+          <button @click="closeAIChat" class="ai-close-btn" v-if="aiWidgetExpanded">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div v-if="aiWidgetExpanded" class="ai-widget-body">
@@ -263,12 +270,6 @@
           </div>
         </div>
       </div>
-      
-      <button @click="closeAIChat" class="ai-close-btn" v-if="aiWidgetExpanded">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </button>
     </div>
 
     <!-- Settings Panel -->
@@ -1295,7 +1296,6 @@ export default {
   padding: 1rem 1.25rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1306,12 +1306,20 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  cursor: pointer;
+  flex: 1;
 }
 
 .ai-header-content h4 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+}
+
+.ai-header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .ai-toggle-btn {
@@ -1452,11 +1460,8 @@ export default {
 }
 
 .ai-close-btn {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 50%;

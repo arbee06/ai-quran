@@ -1,4 +1,4 @@
-# File: ai-quran\src\views\home\index.vue
+# File: ai-quran/src/views/home/index.vue
 
 <template>
   <div class="home-view">
@@ -60,11 +60,6 @@
                 <h3>Read & Study</h3>
                 <p>Beautiful Arabic text with translations and scholarly commentary for deep understanding</p>
               </div>
-              <!-- <div class="feature-arrow">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17l10-10M17 7H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div> -->
             </div>
             
             <div class="feature-card secondary" @click="startVoiceSession">
@@ -83,11 +78,6 @@
                 <h3>Voice Assistant</h3>
                 <p>Natural conversations powered by AI for personalized Quranic insights and guidance</p>
               </div>
-              <!-- <div class="feature-arrow">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17l10-10M17 7H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div> -->
             </div>
             
             <div class="feature-card tertiary">
@@ -105,11 +95,6 @@
                 <h3>Recitation</h3>
                 <p>Listen to beautiful recitations from world-renowned Qaris with crystal clear audio</p>
               </div>
-              <!-- <div class="feature-arrow">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17l10-10M17 7H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div> -->
             </div>
             
             <div class="feature-card quaternary">
@@ -126,11 +111,6 @@
                 <h3>Smart Search</h3>
                 <p>Find verses instantly by keywords, themes, or concepts with intelligent search</p>
               </div>
-              <!-- <div class="feature-arrow">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17l10-10M17 7H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div> -->
             </div>
           </div>
         </div>
@@ -259,18 +239,13 @@
                   <polygon points="5,3 19,12 5,21" fill="currentColor"/>
                 </svg>
               </div>
-              <!-- <div class="arrow-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M7 17l10-10M17 7H7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div> -->
             </div>
           </router-link>
         </div>
       </div>
     </section>
 
-    <!-- Floating Voice Button -->
+    <!-- Modern Floating Voice Button -->
     <button 
       @click="toggleVoiceAssistant" 
       class="voice-fab"
@@ -287,37 +262,41 @@
           <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </div>
+      <div class="fab-pulse"></div>
     </button>
 
-    <!-- Voice Assistant Chat Widget -->
+    <!-- Modern Voice Assistant Widget -->
     <Transition name="voice-widget">
-      <div v-if="showVoiceAssistant" class="voice-widget">
+      <div v-if="showVoiceAssistant" class="voice-widget" :class="{ 'minimized': isMinimized }">
         <div class="widget-header">
           <div class="widget-title">
             <div class="ai-avatar">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <div class="avatar-glow"></div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="ai-icon">
                 <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
               </svg>
             </div>
             <div class="title-text">
-              <h4>AI Assistant</h4>
-              <span class="status">Online</span>
+              <h4>Voice Assistant</h4>
+              <span class="status">
+                <span class="status-indicator"></span>
+                Ready to help
+              </span>
             </div>
           </div>
           <div class="widget-controls">
-            <button @click="minimizeWidget" class="control-btn minimize" v-if="!isMinimized">
+            <button @click="minimizeWidget" class="control-btn minimize" v-if="!isMinimized" title="Minimize">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M6 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 12h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
               </svg>
             </button>
-            <button @click="maximizeWidget" class="control-btn maximize" v-if="isMinimized">
+            <button @click="maximizeWidget" class="control-btn maximize" v-if="isMinimized" title="Expand">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/>
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
               </svg>
             </button>
-            <button @click="toggleVoiceAssistant" class="control-btn close">
+            <button @click="toggleVoiceAssistant" class="control-btn close" title="Close">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -365,7 +344,7 @@
 
 <script>
 import surahService from '../../services/surahService'
-import VoiceAssistant from '../../components/ai/VoiceAssistant.vue'
+import VoiceAssistant from '../ai/VoiceAssistant.vue'
 
 export default {
   name: 'HomeView',
@@ -1250,81 +1229,185 @@ export default {
   transform: translateX(4px);
 }
 
-/* Voice FAB */
+/* Modern Floating Voice Button */
 .voice-fab {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
   width: 64px;
   height: 64px;
-  background: var(--gradient-primary);
-  border: none;
   border-radius: 50%;
-  box-shadow: var(--shadow-xl);
+  border: none;
   cursor: pointer;
-  z-index: 50;
-  transition: all 0.3s ease;
   color: white;
-}
-
-.voice-fab:hover {
-  transform: scale(1.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.9) 0%, 
+    rgba(30, 41, 59, 0.9) 100%);
+  box-shadow: 
+    0 12px 24px rgba(15, 23, 42, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
 }
 
 .voice-fab.active {
-  background: var(--gradient-secondary);
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.9) 0%, 
+    rgba(220, 38, 38, 0.9) 100%);
+  box-shadow: 
+    0 12px 24px rgba(239, 68, 68, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* Voice Widget (Chat-style) */
+.voice-fab:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 
+    0 20px 40px rgba(15, 23, 42, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.fab-icon {
+  position: relative;
+  z-index: 2;
+}
+
+.fab-pulse {
+  position: absolute;
+  inset: -4px;
+  background: inherit;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: fab-pulse 2s infinite;
+}
+
+@keyframes fab-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* Modern Voice Widget */
 .voice-widget {
   position: fixed;
-  bottom: 1rem; /* Changed from 6rem to 1rem */
-  right: 1rem; /* Changed from 2rem to 1rem */
-  width: 380px;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 400px;
   max-height: 600px;
-  background: white;
-  border-radius: 20px;
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(255, 255, 255, 0.9) 100%);
+  border-radius: 24px;
   box-shadow: 
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
+    0 25px 50px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
   z-index: 100;
   overflow: hidden;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.voice-widget.minimized {
+  height: 72px;
+  max-height: 72px;
 }
 
 .widget-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.95) 100%);
   padding: 1rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   color: white;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.widget-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.5) 50%, 
+    transparent 100%);
 }
 
 .widget-title {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.875rem;
 }
 
 .ai-avatar {
-  width: 36px;
-  height: 36px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 40px;
+  height: 40px;
+  background: rgba(30, 41, 59, 0.8);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-glow {
+  position: absolute;
+  inset: -2px;
+  background: conic-gradient(
+    rgba(99, 102, 241, 0.3) 0deg,
+    transparent 60deg,
+    transparent 300deg,
+    rgba(99, 102, 241, 0.3) 360deg
+  );
+  border-radius: 50%;
+  animation: rotate 3s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ai-icon {
+  color: white;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .title-text h4 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+  font-family: inherit;
 }
 
 .status {
@@ -1333,21 +1416,26 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: 500;
 }
 
-.status::before {
-  content: '';
+.status-indicator {
   width: 6px;
   height: 6px;
   background: #4ade80;
   border-radius: 50%;
-  display: inline-block;
   animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5; 
+    transform: scale(1.1);
+  }
 }
 
 .widget-controls {
@@ -1355,42 +1443,49 @@ export default {
   gap: 0.5rem;
 }
 
-.control-btn {
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
+.widget-controls .control-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: white;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
 }
 
-.control-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+.widget-controls .control-btn svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.widget-controls .control-btn:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(99, 102, 241, 0.5);
   transform: scale(1.05);
 }
 
 .widget-content {
   flex: 1;
   overflow: hidden;
-  min-height: 400px;
-  max-height: 500px;
-  display: flex; /* Add this */
-  flex-direction: column; /* Add this */
+  min-height: 450px;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
 }
 
 .widget-content > * {
-  flex: 1; /* Make child expand */
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  margin: 0; /* Remove margins */
-  padding: 0; /* Remove padding */
-  border-radius: 0 0 20px 20px; /* Match widget bottom corners */
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 0 24px 24px;
 }
 
 /* Modern Surah Cards */
@@ -1597,8 +1692,6 @@ export default {
   transform: translateY(20px) scale(0.95);
 }
 
-/* Remove old modal styles */
-
 /* Notification */
 .notification {
   position: fixed;
@@ -1615,6 +1708,18 @@ export default {
   z-index: 110;
   font-weight: 500;
   max-width: 400px;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .notification.success {
@@ -1636,15 +1741,6 @@ export default {
 }
 
 /* Transitions */
-.voice-widget-enter-active, .voice-widget-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.voice-widget-enter-from, .voice-widget-leave-to {
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
-}
-
 .notification-enter-active, .notification-leave-active {
   transition: all 0.3s ease;
 }
@@ -1684,20 +1780,17 @@ export default {
   }
   
   .voice-fab {
-  position: fixed;
-  bottom: 1rem; /* Keep same as widget */
-  right: 1rem; /* Keep same as widget */
-  width: 64px;
-  height: 64px;
-  background: var(--gradient-primary);
-  border: none;
-  border-radius: 50%;
-  box-shadow: var(--shadow-xl);
-  cursor: pointer;
-  z-index: 50;
-  transition: all 0.3s ease;
-  color: white;
-}
+    bottom: 1rem;
+    right: 1rem;
+    width: 56px;
+    height: 56px;
+  }
+  
+  .voice-widget {
+    width: 350px;
+    bottom: 1rem;
+    right: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1728,36 +1821,16 @@ export default {
     padding: 1.25rem;
   }
   
-  .voice-widget .voice-assistant {
-  flex: 1 !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  border-radius: 0 0 20px 20px !important;
-}
-  .widget-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 1rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-  margin: 0; /* Remove margins */
-  border-radius: 20px 20px 0 0; /* Only round top corners */
-}
+  .voice-widget {
+    width: calc(100vw - 2rem);
+    left: 1rem;
+    right: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
   
   .ai-avatar {
     width: 32px;
     height: 32px;
-  }
-  
-  .voice-fab {
-    bottom: 1rem;
-    right: 1rem;
-    width: 56px;
-    height: 56px;
   }
   
   .modern-surah-card {
@@ -1812,6 +1885,13 @@ export default {
     --gray-700: #e5e7eb;
     --gray-800: #f3f4f6;
     --gray-900: #f9fafb;
+  }
+  
+  .voice-widget {
+    background: linear-gradient(145deg, 
+      rgba(31, 41, 55, 0.95) 0%, 
+      rgba(17, 24, 39, 0.9) 100%);
+    border-color: rgba(75, 85, 99, 0.3);
   }
 }
 </style>

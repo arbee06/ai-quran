@@ -1,3 +1,5 @@
+# File: ai-quran/src/views/ai/VoiceAssistant.vue
+
 <template>
   <div class="voice-assistant-container" :class="{ 'fullscreen-mode': isFullscreen, 'compact-mode': !isFullscreen }">
     <!-- Main AI interface with voice visualization -->
@@ -15,7 +17,12 @@
               <div class="bar bar6"></div>
             </div>
             <div class="ai-icon" v-else>
-              <span class="icon-text">🤖</span>
+              <div class="icon-bg">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="ai-icon-svg">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -60,7 +67,9 @@
           @keyup.enter="saveApiKey"
         />
         <button @click="saveApiKey" class="control-button save-key-button">
-          ✓
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>
       </div>
       
@@ -73,9 +82,22 @@
           :disabled="isConnecting"
           :title="isConnected ? 'Disconnect' : 'Connect'"
         >
-          <span v-if="!isConnected && !isConnecting">🔌</span>
-          <span v-else-if="isConnecting" class="spinner">⟳</span>
-          <span v-else>🔴</span>
+          <span v-if="!isConnected && !isConnecting">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+          </span>
+          <span v-else-if="isConnecting" class="spinner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+              <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span v-else>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#ef4444" stroke-width="2" fill="none"/>
+            </svg>
+          </span>
         </button>
         
         <!-- Mic button -->
@@ -86,7 +108,15 @@
           v-if="isConnected"
           :title="micEnabled ? 'Mute microphone' : 'Unmute microphone'"
         >
-          <span>{{ micEnabled ? '🎤' : '🚫' }}</span>
+          <svg v-if="micEnabled" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" stroke="currentColor" stroke-width="2"/>
+            <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" stroke="currentColor" stroke-width="2"/>
+          </svg>
         </button>
         
         <!-- Fullscreen button -->
@@ -96,7 +126,12 @@
           :class="{ 'active': isFullscreen }"
           :title="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'"
         >
-          <span>{{ isFullscreen ? '🗗' : '🗖' }}</span>
+          <svg v-if="!isFullscreen" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke="currentColor" stroke-width="2"/>
+          </svg>
         </button>
         
         <!-- Clear button -->
@@ -106,7 +141,9 @@
           v-if="isConnected && conversationHistory.length > 0"
           title="Clear conversation"
         >
-          <span>🗑️</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
+          </svg>
         </button>
       </div>
     </div>
@@ -1455,37 +1492,45 @@ export default {
 </script>
 
 <style scoped>
+/* Modern Glass Morphism Design */
 .voice-assistant-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   max-width: 400px;
-  padding: 20px;
-  background: linear-gradient(135deg, rgba(0, 10, 30, 0.95), rgba(0, 25, 60, 0.85));
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 120, 255, 0.3);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(0, 150, 255, 0.2);
+  padding: 0;
+  background: linear-gradient(145deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.9) 100%);
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.voice-assistant-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%);
 }
 
 .compact-mode {
-  width: 350px;
-  padding: 15px;
-}
-
-.compact-mode .ai-interface {
-  height: 250px;
-}
-
-.compact-mode .ai-response,
-.compact-mode .user-query {
-  min-height: 50px;
-  font-size: 14px;
-  padding: 12px;
-  max-height: 120px;
-  overflow-y: auto;
+  width: 380px;
+  min-height: 450px;
 }
 
 .fullscreen-mode {
@@ -1504,42 +1549,27 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.fullscreen-mode .ai-interface {
-  height: 70vh;
-  width: 90%;
-  margin: 0 auto;
-}
-
-.fullscreen-mode .ai-voice-visualization {
-  transform: scale(2);
-  margin-bottom: 80px;
-}
-
-.fullscreen-mode .ai-response,
-.fullscreen-mode .user-query {
-  width: 80%;
-  max-width: 1000px;
-  min-height: 120px;
-  font-size: 28px;
-  max-height: 400px;
+  background: linear-gradient(135deg, 
+    #667eea 0%, 
+    #764ba2 50%, 
+    #f093fb 100%);
 }
 
 .ai-interface {
   width: 100%;
-  height: 300px;
-  border-radius: 15px;
-  margin-bottom: 25px;
+  min-height: 320px;
+  border-radius: 24px 24px 0 0;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #051a3a, #000b1a);
-  box-shadow: inset 0 0 30px rgba(0, 120, 255, 0.1);
-  border: 1px solid rgba(0, 150, 255, 0.3);
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.8) 0%, 
+    rgba(30, 41, 59, 0.8) 100%);
+  backdrop-filter: blur(20px);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 2rem 1.5rem;
 }
 
 .ai-interface::before {
@@ -1549,92 +1579,152 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(0, 120, 255, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, 
+    rgba(103, 126, 234, 0.1) 0%, 
+    transparent 70%);
   opacity: 0.6;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.6s ease;
 }
 
 .ai-interface.ai-speaking::before {
   opacity: 1;
-  animation: pulse-glow 2s infinite alternate;
+  animation: speaking-pulse 2s infinite alternate;
 }
 
 .ai-interface.ai-listening::before {
   opacity: 0.8;
-  animation: listen-pulse 1.5s infinite alternate;
+  animation: listening-pulse 1.5s infinite alternate;
+  background: radial-gradient(circle at 50% 50%, 
+    rgba(34, 197, 94, 0.15) 0%, 
+    transparent 70%);
 }
 
-@keyframes pulse-glow {
-  from { opacity: 0.6; }
-  to { opacity: 1; }
+@keyframes speaking-pulse {
+  from { 
+    opacity: 0.6; 
+    transform: scale(1);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1.02);
+  }
 }
 
-@keyframes listen-pulse {
-  from { opacity: 0.4; }
-  to { opacity: 0.8; }
+@keyframes listening-pulse {
+  from { 
+    opacity: 0.4; 
+    transform: scale(1);
+  }
+  to { 
+    opacity: 0.8; 
+    transform: scale(1.01);
+  }
 }
 
 .ai-core {
   position: relative;
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 2;
+  gap: 1.5rem;
 }
 
 .ai-voice-visualization {
-  margin-bottom: 30px;
+  margin-bottom: 1rem;
 }
 
 .visualization-circle {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #002c5a, #001528);
-  border: 3px solid rgba(0, 150, 255, 0.6);
+  background: linear-gradient(145deg, 
+    rgba(30, 41, 59, 0.6) 0%, 
+    rgba(15, 23, 42, 0.8) 100%);
+  border: 2px solid rgba(99, 102, 241, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 25px rgba(0, 150, 255, 0.4);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(15px);
+}
+
+.visualization-circle::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    rgba(103, 126, 234, 0.3) 0deg,
+    transparent 60deg,
+    transparent 300deg,
+    rgba(103, 126, 234, 0.3) 360deg
+  );
+  animation: rotate 4s linear infinite;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.visualization-circle.pulsing::before {
+  opacity: 1;
 }
 
 .visualization-circle.pulsing {
   animation: voice-glow 1.5s infinite alternate;
-  transform: scale(1.1);
+  transform: scale(1.05);
+  border-color: rgba(103, 126, 234, 0.4);
+  box-shadow: 
+    0 15px 40px rgba(103, 126, 234, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.3) inset;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes voice-glow {
   from { 
-    box-shadow: 0 0 25px rgba(0, 150, 255, 0.4);
-    border-color: rgba(0, 150, 255, 0.6);
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.2) inset;
   }
   to { 
-    box-shadow: 0 0 40px rgba(0, 200, 255, 0.8);
-    border-color: rgba(0, 200, 255, 0.9);
+    box-shadow: 
+      0 20px 50px rgba(103, 126, 234, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.4) inset;
   }
 }
 
 .voice-bars {
-  width: 70%;
-  height: 70%;
+  width: 60px;
+  height: 40px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  gap: 4px;
 }
 
 .bar {
-  width: 4px;
-  background: linear-gradient(to top, #00a6ff, #00d4ff);
-  border-radius: 4px;
-  height: 15%;
-  animation: soundBars 0.6s infinite alternate;
-  box-shadow: 0 0 8px rgba(0, 166, 255, 0.6);
+  width: 6px;
+  background: linear-gradient(to top, 
+    #6366f1 0%, 
+    #8b5cf6 50%, 
+    #ec4899 100%);
+  border-radius: 3px;
+  height: 20%;
+  animation: soundBars 0.8s infinite alternate;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
 }
 
 .bar1 { animation-delay: 0.1s; }
@@ -1645,20 +1735,41 @@ export default {
 .bar6 { animation-delay: 0.1s; }
 
 @keyframes soundBars {
-  0% { height: 15%; opacity: 0.7; }
-  100% { height: 80%; opacity: 1; }
+  0% { 
+    height: 20%; 
+    opacity: 0.7; 
+    transform: scaleY(1);
+  }
+  100% { 
+    height: 90%; 
+    opacity: 1; 
+    transform: scaleY(1.1);
+  }
 }
 
 .ai-icon {
-  color: #00d4ff;
-  font-size: 40px;
-  animation: icon-breathe 3s ease-in-out infinite;
-  text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+  position: relative;
 }
 
-.icon-text {
-  font-size: 40px;
-  display: block;
+.icon-bg {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(145deg, 
+    rgba(103, 126, 234, 0.2) 0%, 
+    rgba(118, 75, 162, 0.2) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-icon-svg {
+  color: #667eea;
+  filter: drop-shadow(0 2px 4px rgba(103, 126, 234, 0.3));
+  animation: icon-breathe 3s ease-in-out infinite;
 }
 
 @keyframes icon-breathe {
@@ -1667,66 +1778,69 @@ export default {
 }
 
 .ai-response, .user-query {
-  width: 85%;
-  min-height: 70px;
-  background: rgba(0, 25, 60, 0.7);
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 15px;
-  color: #ffffff;
-  font-size: 16px;
-  line-height: 1.6;
+  width: 90%;
+  max-width: 320px;
+  min-height: 60px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  color: #e2e8f0;
+  font-size: 14px;
+  line-height: 1.5;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 100, 200, 0.2);
-  border: 1px solid rgba(0, 150, 255, 0.3);
-  animation: fadeIn 0.5s ease;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px);
 }
 
-.ai-response::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 150, 255, 0.1), transparent);
-  animation: shimmer 3s infinite;
+.ai-response {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
-@keyframes shimmer {
-  0% { left: -100%; }
-  100% { left: 100%; }
+.user-query {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
 }
 
 .holographic-text {
-  color: transparent !important;
   background: linear-gradient(
     90deg, 
-    rgba(0, 255, 255, 0.9), 
-    rgba(0, 200, 255, 0.9), 
-    rgba(0, 150, 255, 0.9), 
-    rgba(100, 150, 255, 0.9)
+    #6366f1 0%, 
+    #8b5cf6 50%, 
+    #ec4899 100%
   );
-  background-size: 400% 100%;
+  background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
-  animation: hologram-flow 4s ease-in-out infinite;
-  text-shadow: 
-    0 0 10px rgba(0, 200, 255, 0.6),
-    0 0 20px rgba(0, 150, 255, 0.4),
-    0 0 30px rgba(0, 100, 255, 0.2);
+  -webkit-text-fill-color: transparent;
+  animation: hologram-flow 3s ease-in-out infinite;
+  font-weight: 500;
 }
 
 @keyframes hologram-flow {
-  0% { background-position: 0% 50%; filter: hue-rotate(0deg); }
-  50% { background-position: 100% 50%; filter: hue-rotate(30deg); }
-  100% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .typed-text {
@@ -1736,13 +1850,13 @@ export default {
 
 .cursor {
   display: inline-block;
-  width: 3px;
-  height: 20px;
-  background: linear-gradient(to bottom, #00a6ff, #00d4ff);
-  margin-left: 3px;
+  width: 2px;
+  height: 16px;
+  background: linear-gradient(to bottom, #6366f1, #8b5cf6);
+  margin-left: 2px;
   animation: cursor-blink 1.2s infinite;
   vertical-align: middle;
-  box-shadow: 0 0 8px rgba(0, 166, 255, 0.8);
+  border-radius: 1px;
 }
 
 .cursor.typing {
@@ -1759,18 +1873,18 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 30px;
+  gap: 4px;
+  height: 24px;
 }
 
 .typing-indicator span {
-  height: 10px;
-  width: 10px;
-  margin: 0 3px;
-  background: linear-gradient(to bottom, #00a6ff, #00d4ff);
+  height: 8px;
+  width: 8px;
+  background: linear-gradient(45deg, #6366f1, #8b5cf6);
   display: block;
   border-radius: 50%;
   opacity: 0.4;
-  box-shadow: 0 0 8px rgba(0, 166, 255, 0.6);
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
 }
 
 .typing-indicator span:nth-of-type(1) {
@@ -1786,55 +1900,67 @@ export default {
 }
 
 @keyframes typing-bounce {
-  0%, 100% { transform: translateY(0px); opacity: 0.4; }
-  50% { transform: translateY(-8px); opacity: 1; }
+  0%, 100% { 
+    transform: translateY(0px) scale(1); 
+    opacity: 0.4; 
+  }
+  50% { 
+    transform: translateY(-6px) scale(1.1); 
+    opacity: 1; 
+  }
 }
 
 .ai-status {
   position: absolute;
-  bottom: 10px;
+  bottom: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  color: #7fa8d7;
-  font-size: 12px;
-  background: rgba(0, 20, 40, 0.8);
-  padding: 5px 12px;
-  border-radius: 15px;
-  border: 1px solid rgba(0, 150, 255, 0.3);
+  gap: 8px;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  min-width: 120px;
+  justify-content: center;
 }
 
 .status-dot {
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  margin-right: 8px;
-  background-color: #444;
+  background: #94a3b8;
   transition: all 0.3s ease;
 }
 
 .status-dot.connected {
-  background: linear-gradient(45deg, #00a6ff, #00d4ff);
-  box-shadow: 0 0 12px rgba(0, 166, 255, 0.8);
+  background: linear-gradient(45deg, #10b981, #059669);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
 }
 
 .status-dot.connecting {
-  background: linear-gradient(45deg, #ffa500, #ffcc00);
-  box-shadow: 0 0 12px rgba(255, 165, 0, 0.8);
+  background: linear-gradient(45deg, #f59e0b, #d97706);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
   animation: connecting-pulse 1.5s infinite;
 }
 
 .status-dot.speaking {
-  background: linear-gradient(45deg, #00ffaa, #00ff80);
-  box-shadow: 0 0 12px rgba(0, 255, 170, 0.8);
-  animation: speaking-pulse 1s infinite;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  box-shadow: 0 0 8px rgba(103, 126, 234, 0.4);
+  animation: speaking-dot 1s infinite;
 }
 
 .status-dot.listening {
-  background: linear-gradient(45deg, #00a6ff, #0080ff);
-  box-shadow: 0 0 12px rgba(0, 166, 255, 0.8);
-  animation: listening-pulse 2s infinite;
+  background: linear-gradient(45deg, #22c55e, #16a34a);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+  animation: listening-dot 2s infinite;
 }
 
 @keyframes connecting-pulse {
@@ -1842,75 +1968,83 @@ export default {
   50% { opacity: 0.6; transform: scale(1.2); }
 }
 
-@keyframes speaking-pulse {
+@keyframes speaking-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.3); }
 }
 
-@keyframes listening-pulse {
+@keyframes listening-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.7; transform: scale(1.15); }
 }
 
 .control-panel {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 0 0 24px 24px;
+  border-top: 1px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(20px);
 }
 
 .api-key-container {
   display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
   width: 100%;
-  max-width: 400px;
-  margin-bottom: 20px;
 }
 
 .api-key-input {
   flex: 1;
-  padding: 14px 18px;
-  border: 2px solid rgba(0, 150, 255, 0.4);
-  border-radius: 30px 0 0 30px;
-  background: rgba(0, 20, 40, 0.8);
-  color: #ffffff;
+  padding: 12px 16px;
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.8);
+  color: #e2e8f0;
   font-size: 14px;
   outline: none;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.api-key-input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
 }
 
 .api-key-input:focus {
-  border-color: #00a6ff;
-  box-shadow: 0 0 15px rgba(0, 166, 255, 0.5);
-}
-
-.save-key-button {
-  border-radius: 0 30px 30px 0 !important;
-  padding: 0 20px;
-  background: linear-gradient(135deg, #00a6ff, #0080ff) !important;
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(30, 41, 59, 0.9);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .control-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .control-button {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #003366, #001528);
-  border: 2px solid rgba(0, 150, 255, 0.4);
-  color: #ffffff;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  font-size: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+}
+
+.control-button svg {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .control-button::before {
@@ -1920,44 +2054,66 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle, rgba(0, 150, 255, 0.2) 0%, transparent 70%);
+  background: linear-gradient(145deg, 
+    rgba(99, 102, 241, 0.1) 0%, 
+    transparent 100%);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .control-button:hover:not(:disabled) {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 150, 255, 0.4);
-  border-color: #00a6ff;
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(99, 102, 241, 0.5);
+  color: #6366f1;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .control-button:hover:not(:disabled)::before {
   opacity: 1;
 }
 
+.control-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
 .control-button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .call-button {
-  background: linear-gradient(135deg, #004080, #001a33);
-  border-color: #0055a4;
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+.call-button:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.6);
+  color: #059669;
 }
 
 .call-button.active {
-  background: linear-gradient(135deg, #801a00, #330d00);
-  border-color: #a42500;
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.call-button.active:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #dc2626;
 }
 
 .call-button.connecting {
-  background: linear-gradient(135deg, #805400, #332200);
-  border-color: #a46a00;
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #f59e0b;
 }
 
-.spinner {
+.spinner svg {
   animation: spin 1s linear infinite;
-  display: inline-block;
 }
 
 @keyframes spin {
@@ -1966,32 +2122,124 @@ export default {
 }
 
 .mic-button {
-  background: linear-gradient(135deg, #004d99, #003366);
-  border-color: #0066cc;
+  background: rgba(99, 102, 241, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #6366f1;
+}
+
+.mic-button:hover:not(:disabled) {
+  background: rgba(99, 102, 241, 0.3);
+  border-color: rgba(99, 102, 241, 0.6);
 }
 
 .mic-button.mic-disabled {
-  background: linear-gradient(135deg, #990000, #660000);
-  border-color: #cc0000;
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.mic-button.mic-disabled:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.6);
 }
 
 .fullscreen-button {
-  background: linear-gradient(135deg, #005a80, #003347);
-  border-color: #0077a7;
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #8b5cf6;
+}
+
+.fullscreen-button:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
 }
 
 .fullscreen-button.active {
-  background: linear-gradient(135deg, #008080, #004747);
-  border-color: #00a3a3;
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.6);
+  color: #7c3aed;
 }
 
 .clear-button {
-  background: linear-gradient(135deg, #1a3d66, #0d1f33);
-  border-color: #234980;
+  background: rgba(107, 114, 128, 0.2);
+  border-color: rgba(107, 114, 128, 0.4);
+  color: #9ca3af;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.clear-button:hover:not(:disabled) {
+  background: rgba(107, 114, 128, 0.3);
+  border-color: rgba(107, 114, 128, 0.6);
+  color: #6b7280;
+}
+
+.save-key-button {
+  background: rgba(16, 185, 129, 0.3) !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  color: #10b981 !important;
+  border-radius: 12px !important;
+}
+
+.save-key-button:hover {
+  background: rgba(16, 185, 129, 0.4) !important;
+  color: #059669 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .compact-mode {
+    width: 100%;
+    max-width: 350px;
+  }
+  
+  .visualization-circle {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .icon-bg {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .ai-icon-svg {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .control-button {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .control-buttons {
+    gap: 8px;
+  }
+  
+  .ai-response, .user-query {
+    font-size: 13px;
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  .voice-assistant-container {
+    background: linear-gradient(145deg, 
+      rgba(0, 0, 0, 0.4) 0%, 
+      rgba(0, 0, 0, 0.2) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .ai-response, .user-query {
+    color: #f8fafc;
+  }
+  
+  .api-key-input {
+    color: #f8fafc;
+  }
+  
+  .api-key-input::placeholder {
+    color: rgba(148, 163, 184, 0.6);
+  }
 }
 </style>

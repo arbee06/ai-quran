@@ -245,77 +245,17 @@
       </div>
     </section>
 
-    <!-- Modern Floating Voice Button -->
-    <button 
-      @click="toggleVoiceAssistant" 
-      class="voice-fab"
-      :class="{ 'active': showVoiceAssistant }"
-    >
-      <div class="fab-icon">
-        <svg v-if="!showVoiceAssistant" width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
-          <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
-          <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>
-        </svg>
-        <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="fab-pulse"></div>
-    </button>
-
-    <!-- Modern Voice Assistant Widget -->
-    <Transition name="voice-widget">
-      <div v-if="showVoiceAssistant" class="voice-widget" :class="{ 'minimized': isMinimized }">
-        <div class="widget-header">
-          <div class="widget-title">
-            <div class="ai-avatar">
-              <div class="avatar-glow"></div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="ai-icon">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
-              </svg>
-            </div>
-            <div class="title-text">
-              <h4>Voice Assistant</h4>
-              <span class="status">
-                <span class="status-indicator"></span>
-                Ready to help
-              </span>
-            </div>
-          </div>
-          <div class="widget-controls">
-            <button @click="minimizeWidget" class="control-btn minimize" v-if="!isMinimized" title="Minimize">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M6 12h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button @click="maximizeWidget" class="control-btn maximize" v-if="isMinimized" title="Expand">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
-              </svg>
-            </button>
-            <button @click="toggleVoiceAssistant" class="control-btn close" title="Close">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="widget-content" v-if="!isMinimized">
-          <VoiceAssistant 
-            ref="voiceAssistant"
-            @navigate-to-surah="handleNavigateToSurah"
-            @navigate-to-verse="handleNavigateToVerse"
-            @navigate-to-page="handleNavigateToPage"
-            @play-recitation="handlePlayRecitation"
-            @bookmark-verse="handleBookmarkVerse"
-            @toggle-theme="handleToggleTheme"
-          />
-        </div>
-      </div>
-    </Transition>
+    <!-- Voice Assistant Widget - Self-contained -->
+    <VoiceAssistant 
+      ref="voiceAssistant"
+      @navigate-to-surah="handleNavigateToSurah"
+      @navigate-to-verse="handleNavigateToVerse"
+      @navigate-to-page="handleNavigateToPage"
+      @play-recitation="handlePlayRecitation"
+      @bookmark-verse="handleBookmarkVerse"
+      @toggle-theme="handleToggleTheme"
+      @start-voice-session="handleStartVoiceSession"
+    />
 
     <!-- Notifications -->
     <Transition name="notification">
@@ -358,8 +298,6 @@ export default {
       filterType: 'all',
       viewMode: 'grid',
       loading: true,
-      showVoiceAssistant: false,
-      isMinimized: false,
       notification: null
     }
   },
@@ -405,23 +343,8 @@ export default {
       // Debounced search implementation
     },
     
-    toggleVoiceAssistant() {
-      this.showVoiceAssistant = !this.showVoiceAssistant
-      if (!this.showVoiceAssistant) {
-        this.isMinimized = false
-      }
-    },
-    
-    minimizeWidget() {
-      this.isMinimized = true
-    },
-    
-    maximizeWidget() {
-      this.isMinimized = false
-    },
-    
     startVoiceSession() {
-      this.showVoiceAssistant = true
+      this.$refs.voiceAssistant?.startVoiceSession()
     },
     
     scrollToSurahs() {
@@ -469,6 +392,10 @@ export default {
     handleToggleTheme() {
       this.$emit('toggle-theme')
       this.showNotification('Theme toggled', 'info')
+    },
+    
+    handleStartVoiceSession() {
+      // Voice session started from the widget - no notification needed
     },
     
     showNotification(message, type = 'info') {
@@ -909,18 +836,6 @@ export default {
   margin: 0;
 }
 
-.feature-arrow {
-  align-self: flex-end;
-  color: var(--gray-400);
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-}
-
-.feature-card:hover .feature-arrow {
-  color: var(--accent-color);
-  transform: translate(4px, -4px);
-}
-
 .feature-card:hover .feature-icon {
   transform: scale(1.1);
 }
@@ -1127,367 +1042,6 @@ export default {
   grid-template-columns: 1fr;
 }
 
-.surah-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: white;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-xl);
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.surah-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary-200);
-}
-
-.surah-number {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.125rem;
-}
-
-.surah-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.surah-names {
-  margin-bottom: 0.5rem;
-}
-
-.arabic-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--gray-900);
-  margin: 0 0 0.25rem 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.english-name {
-  font-size: 0.875rem;
-  color: var(--gray-600);
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.surah-meta {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  font-size: 0.75rem;
-}
-
-.revelation-type {
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.revelation-type.meccan {
-  background: var(--warning-50);
-  color: var(--warning-700);
-}
-
-.revelation-type.medinan {
-  background: var(--success-50);
-  color: var(--success-700);
-}
-
-.verse-count {
-  color: var(--gray-500);
-  font-weight: 500;
-}
-
-.surah-arrow {
-  color: var(--gray-400);
-  transition: all 0.2s ease;
-}
-
-.surah-card:hover .surah-arrow {
-  color: var(--primary-500);
-  transform: translateX(4px);
-}
-
-/* Modern Floating Voice Button */
-.voice-fab {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  color: white;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.9) 0%, 
-    rgba(30, 41, 59, 0.9) 100%);
-  box-shadow: 
-    0 12px 24px rgba(15, 23, 42, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-}
-
-.voice-fab.active {
-  background: linear-gradient(135deg, 
-    rgba(239, 68, 68, 0.9) 0%, 
-    rgba(220, 38, 38, 0.9) 100%);
-  box-shadow: 
-    0 12px 24px rgba(239, 68, 68, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.voice-fab:hover {
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 
-    0 20px 40px rgba(15, 23, 42, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
-}
-
-.fab-icon {
-  position: relative;
-  z-index: 2;
-}
-
-.fab-pulse {
-  position: absolute;
-  inset: -4px;
-  background: inherit;
-  border-radius: 50%;
-  opacity: 0.6;
-  animation: fab-pulse 2s infinite;
-}
-
-@keyframes fab-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.3;
-  }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-}
-
-/* Modern Voice Widget */
-.voice-widget {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  width: 400px;
-  max-height: 600px;
-  background: linear-gradient(145deg, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(255, 255, 255, 0.9) 100%);
-  border-radius: 24px;
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  z-index: 100;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(20px);
-  display: flex;
-  flex-direction: column;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.voice-widget.minimized {
-  height: 72px;
-  max-height: 72px;
-}
-
-.widget-header {
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.95) 0%, 
-    rgba(30, 41, 59, 0.95) 100%);
-  padding: 1rem 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
-}
-
-.widget-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255, 255, 255, 0.5) 50%, 
-    transparent 100%);
-}
-
-.widget-title {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-}
-
-.ai-avatar {
-  width: 40px;
-  height: 40px;
-  background: rgba(30, 41, 59, 0.8);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.avatar-glow {
-  position: absolute;
-  inset: -2px;
-  background: conic-gradient(
-    rgba(99, 102, 241, 0.3) 0deg,
-    transparent 60deg,
-    transparent 300deg,
-    rgba(99, 102, 241, 0.3) 360deg
-  );
-  border-radius: 50%;
-  animation: rotate 3s linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.ai-icon {
-  color: white;
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-.title-text h4 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: inherit;
-}
-
-.status {
-  font-size: 0.75rem;
-  opacity: 0.9;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 500;
-}
-
-.status-indicator {
-  width: 6px;
-  height: 6px;
-  background: #4ade80;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { 
-    opacity: 1; 
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.5; 
-    transform: scale(1.1);
-  }
-}
-
-.widget-controls {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.widget-controls .control-btn {
-  width: 32px;
-  height: 32px;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: white;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-}
-
-.widget-controls .control-btn svg {
-  width: 16px;
-  height: 16px;
-  display: block;
-}
-
-.widget-controls .control-btn:hover {
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(99, 102, 241, 0.5);
-  transform: scale(1.05);
-}
-
-.widget-content {
-  flex: 1;
-  overflow: hidden;
-  min-height: 450px;
-  max-height: 520px;
-  display: flex;
-  flex-direction: column;
-}
-
-.widget-content > * {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  border-radius: 0 0 24px 24px;
-}
-
 /* Modern Surah Cards */
 .modern-surah-card {
   position: relative;
@@ -1672,26 +1226,6 @@ export default {
   transform: scale(1.1);
 }
 
-.arrow-icon {
-  color: var(--gray-400);
-  transition: all 0.3s ease;
-}
-
-.modern-surah-card:hover .arrow-icon {
-  color: #3b82f6;
-  transform: translate(4px, -4px);
-}
-
-/* Voice Widget Transitions */
-.voice-widget-enter-active, .voice-widget-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.voice-widget-enter-from, .voice-widget-leave-to {
-  opacity: 0;
-  transform: translateY(20px) scale(0.95);
-}
-
 /* Notification */
 .notification {
   position: fixed;
@@ -1778,19 +1312,6 @@ export default {
   .surahs-grid.grid {
     grid-template-columns: 1fr;
   }
-  
-  .voice-fab {
-    bottom: 1rem;
-    right: 1rem;
-    width: 56px;
-    height: 56px;
-  }
-  
-  .voice-widget {
-    width: 350px;
-    bottom: 1rem;
-    right: 1rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1819,18 +1340,6 @@ export default {
   
   .feature-card {
     padding: 1.25rem;
-  }
-  
-  .voice-widget {
-    width: calc(100vw - 2rem);
-    left: 1rem;
-    right: 1rem;
-    max-height: calc(100vh - 2rem);
-  }
-  
-  .ai-avatar {
-    width: 32px;
-    height: 32px;
   }
   
   .modern-surah-card {
@@ -1885,13 +1394,6 @@ export default {
     --gray-700: #e5e7eb;
     --gray-800: #f3f4f6;
     --gray-900: #f9fafb;
-  }
-  
-  .voice-widget {
-    background: linear-gradient(145deg, 
-      rgba(31, 41, 55, 0.95) 0%, 
-      rgba(17, 24, 39, 0.9) 100%);
-    border-color: rgba(75, 85, 99, 0.3);
   }
 }
 </style>

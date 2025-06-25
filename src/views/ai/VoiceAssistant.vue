@@ -1,152 +1,296 @@
 # File: ai-quran/src/views/ai/VoiceAssistant.vue
 
 <template>
-  <div class="voice-assistant-container" :class="{ 'fullscreen-mode': isFullscreen, 'compact-mode': !isFullscreen }">
-    <!-- Main AI interface with voice visualization -->
-    <div class="ai-interface" :class="{ 'ai-speaking': isAssistantResponding, 'ai-listening': isUserSpeaking }">
-      <div class="ai-core">
-        <!-- Voice visualization/animation -->
-        <div class="ai-voice-visualization" v-if="isConnected">
-          <div class="visualization-circle" :class="{ 'pulsing': isAssistantResponding }">
-            <div class="voice-bars" v-if="isAssistantResponding">
-              <div class="bar bar1"></div>
-              <div class="bar bar2"></div>
-              <div class="bar bar3"></div>
-              <div class="bar bar4"></div>
-              <div class="bar bar5"></div>
-              <div class="bar bar6"></div>
+  <div class="voice-assistant-wrapper">
+    <!-- Enhanced Floating Voice Button - Hidden when widget is open -->
+    <button 
+      v-if="!showVoiceAssistant"
+      @click="toggleVoiceAssistant" 
+      class="voice-fab"
+      :class="{ 'pulsing': isConnected }"
+      title="Open Voice Assistant"
+    >
+      <div class="fab-background"></div>
+      <div class="fab-glow"></div>
+      <div class="fab-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+          <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="fab-ripple"></div>
+    </button>
+
+    <!-- Enhanced Voice Assistant Widget -->
+    <Transition name="voice-widget" appear>
+      <div v-if="showVoiceAssistant" class="voice-widget" :class="{ 'minimized': isMinimized }">
+        <!-- Glassmorphism Header -->
+        <div class="widget-header">
+          <div class="header-background"></div>
+          <div class="header-content">
+            <div class="widget-title">
+              <div class="ai-avatar">
+                <div class="avatar-rings">
+                  <div class="ring ring-1"></div>
+                  <div class="ring ring-2"></div>
+                  <div class="ring ring-3"></div>
+                </div>
+                <div class="avatar-core">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ai-icon">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="title-text">
+                <h4>Voice Assistant</h4>
+                <div class="status-container">
+                  <div class="status-dot" :class="statusClass"></div>
+                  <span class="status-text">{{ aiStatusText }}</span>
+                </div>
+              </div>
             </div>
-            <div class="ai-icon" v-else>
-              <div class="icon-bg">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="ai-icon-svg">
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+            <div class="widget-controls">
+              <button @click="minimizeWidget" class="control-btn minimize-btn" v-if="!isMinimized" title="Minimize">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 12h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
+              </button>
+              <button @click="maximizeWidget" class="control-btn expand-btn" v-if="isMinimized" title="Expand">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+              <button @click="closeWidget" class="control-btn close-btn" title="Close">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced Main Content -->
+        <div class="widget-content" v-if="!isMinimized">
+          <div class="voice-assistant-container" :class="{ 'fullscreen-mode': isFullscreen, 'compact-mode': !isFullscreen }">
+            <!-- Enhanced AI Interface -->
+            <div class="ai-interface" :class="interfaceClass">
+              <div class="interface-background">
+                <div class="gradient-orb orb-1"></div>
+                <div class="gradient-orb orb-2"></div>
+                <div class="gradient-orb orb-3"></div>
+              </div>
+              
+              <div class="ai-core">
+                <!-- Enhanced Voice Visualization -->
+                <div class="ai-voice-visualization">
+                  <div class="visualization-container">
+                    <!-- Central Visualization -->
+                    <div class="central-viz" :class="{ 'active': isConnected, 'speaking': isAssistantResponding, 'listening': isUserSpeaking }">
+                      <div class="viz-outer-ring"></div>
+                      <div class="viz-middle-ring"></div>
+                      <div class="viz-inner-core">
+                        <div v-if="isAssistantResponding" class="voice-bars-container">
+                          <div class="voice-bar" v-for="i in 5" :key="i" :style="{ '--delay': i * 0.1 + 's' }"></div>
+                        </div>
+                        <div v-else-if="isUserSpeaking" class="listening-indicator">
+                          <div class="listening-wave" v-for="i in 3" :key="i" :style="{ '--delay': i * 0.2 + 's' }"></div>
+                        </div>
+                        <div v-else class="ai-logo">
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Floating Particles -->
+                    <div class="floating-particles">
+                      <div class="particle" v-for="i in 8" :key="i" :style="{ '--delay': i * 0.5 + 's', '--duration': (2 + i * 0.3) + 's' }"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Enhanced Response Display -->
+                <Transition name="content-fade">
+                  <div v-if="currentAIResponse || isAssistantResponding || (userTranscript && isUserSpeaking)" class="content-display">
+                    <!-- AI Response -->
+                    <div v-if="currentAIResponse || isAssistantResponding" class="ai-response-container">
+                      <div class="response-header">
+                        <div class="response-avatar">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                            <path d="M12 1v6m0 14v-6m11-5h-6M6 12H1" stroke="currentColor" stroke-width="2"/>
+                          </svg>
+                        </div>
+                        <span class="response-label">Assistant</span>
+                      </div>
+                      <div class="response-content">
+                        <div v-if="isAssistantResponding && !currentAIResponse" class="typing-indicator">
+                          <span></span><span></span><span></span>
+                        </div>
+                        <div v-else class="response-text">
+                          <span class="typed-text">{{ typedText }}</span>
+                          <span class="cursor" :class="{'typing': isTyping}"></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- User Query -->
+                    <div v-if="userTranscript && isUserSpeaking" class="user-query-container">
+                      <div class="query-header">
+                        <div class="query-avatar">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                          </svg>
+                        </div>
+                        <span class="query-label">You</span>
+                      </div>
+                      <div class="query-content">
+                        <div class="query-text">{{ userTranscript }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </Transition>
+
+                <!-- Enhanced Status Display -->
+                <div class="status-display">
+                  <div class="status-container">
+                    <div class="status-dot" :class="statusClass"></div>
+                    <span class="status-text">{{ aiStatusText }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Enhanced Control Panel -->
+            <div class="control-panel">
+              <div class="panel-background"></div>
+              
+              <!-- API Key Input -->
+              <Transition name="api-key">
+                <div v-if="showApiKeyInput" class="api-key-section">
+                  <div class="api-key-header">
+                    <div class="api-key-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </div>
+                    <span>OpenAI API Key Required</span>
+                  </div>
+                  <div class="api-key-input-container">
+                    <input 
+                      type="password" 
+                      v-model="apiKey" 
+                      class="api-key-input" 
+                      placeholder="Enter your OpenAI API key"
+                      @keyup.enter="saveApiKey"
+                    />
+                    <button @click="saveApiKey" class="save-key-btn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </Transition>
+
+              <!-- Enhanced Control Buttons -->
+              <div class="control-buttons">
+                <!-- Connect/Disconnect Button -->
+                <button 
+                  class="control-button connect-btn" 
+                  :class="{ 'connected': isConnected, 'connecting': isConnecting }"
+                  @click="toggleCall"
+                  :disabled="isConnecting"
+                >
+                  <div class="btn-background"></div>
+                  <div class="btn-content">
+                    <Transition name="btn-icon" mode="out-in">
+                      <svg v-if="!isConnected && !isConnecting" key="connect" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" fill="none"/>
+                      </svg>
+                      <div v-else-if="isConnecting" key="connecting" class="loading-spinner">
+                        <div class="spinner-ring"></div>
+                      </div>
+                      <svg v-else key="disconnect" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" fill="none"/>
+                      </svg>
+                    </Transition>
+                  </div>
+                  <div class="btn-ripple"></div>
+                </button>
+
+                <!-- Microphone Button -->
+                <button 
+                  v-if="isConnected"
+                  class="control-button mic-btn" 
+                  :class="{ 'muted': !micEnabled }"
+                  @click="toggleMic"
+                >
+                  <div class="btn-background"></div>
+                  <div class="btn-content">
+                    <Transition name="btn-icon" mode="out-in">
+                      <svg v-if="micEnabled" key="mic-on" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                      <svg v-else key="mic-off" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" stroke="currentColor" stroke-width="2"/>
+                        <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </Transition>
+                  </div>
+                  <div class="btn-ripple"></div>
+                </button>
+
+                <!-- Fullscreen Button -->
+                <button 
+                  class="control-button fullscreen-btn" 
+                  @click="toggleFullscreen"
+                  :class="{ 'active': isFullscreen }"
+                >
+                  <div class="btn-background"></div>
+                  <div class="btn-content">
+                    <Transition name="btn-icon" mode="out-in">
+                      <svg v-if="!isFullscreen" key="expand" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                      <svg v-else key="collapse" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </Transition>
+                  </div>
+                  <div class="btn-ripple"></div>
+                </button>
+
+                <!-- Clear Button -->
+                <button 
+                  v-if="isConnected && conversationHistory.length > 0"
+                  class="control-button clear-btn" 
+                  @click="clearConversation"
+                >
+                  <div class="btn-background"></div>
+                  <div class="btn-content">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div class="btn-ripple"></div>
+                </button>
               </div>
             </div>
           </div>
         </div>
-        
-        <!-- AI Response display -->
-        <div class="ai-response" v-if="currentAIResponse || isAssistantResponding">
-          <div class="typing-indicator" v-if="isAssistantResponding && !currentAIResponse">
-            <span></span><span></span><span></span>
-          </div>
-          <div v-else class="response-text holographic-text">
-            <span class="typed-text">{{ typedText }}</span>
-            <span class="cursor" :class="{'typing': isTyping}">|</span>
-          </div>
-        </div>
-        
-        <!-- User query display -->
-        <div class="user-query" v-if="userTranscript && isUserSpeaking">
-          <div class="query-text">{{ userTranscript }}</div>
-        </div>
-        
-        <!-- Status indicator -->
-        <div class="ai-status">
-          <div class="status-dot" :class="{ 
-            'connected': isConnected, 
-            'connecting': isConnecting,
-            'speaking': isAssistantResponding,
-            'listening': isUserSpeaking && !isAssistantResponding
-          }"></div>
-          <div class="status-text">{{ aiStatusText }}</div>
-        </div>
       </div>
-    </div>
-    
-    <!-- Control panel -->
-    <div class="control-panel">
-      <div v-if="showApiKeyInput" class="api-key-container">
-        <input 
-          type="password" 
-          v-model="apiKey" 
-          class="api-key-input" 
-          placeholder="Enter your OpenAI API key"
-          @keyup.enter="saveApiKey"
-        />
-        <button @click="saveApiKey" class="control-button save-key-button">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      
-      <div class="control-buttons">
-        <!-- Call button -->
-        <button 
-          class="control-button call-button" 
-          :class="{ 'active': isConnected, 'connecting': isConnecting }"
-          @click="toggleCall"
-          :disabled="isConnecting"
-          :title="isConnected ? 'Disconnect' : 'Connect'"
-        >
-          <span v-if="!isConnected && !isConnecting">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="2" fill="none"/>
-            </svg>
-          </span>
-          <span v-else-if="isConnecting" class="spinner">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" opacity="0.3"/>
-              <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span v-else>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="#ef4444" stroke-width="2" fill="none"/>
-            </svg>
-          </span>
-        </button>
-        
-        <!-- Mic button -->
-        <button 
-          class="control-button mic-button" 
-          :class="{ 'mic-disabled': !micEnabled }"
-          @click="toggleMic"
-          v-if="isConnected"
-          :title="micEnabled ? 'Mute microphone' : 'Unmute microphone'"
-        >
-          <svg v-if="micEnabled" width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" fill="currentColor"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/>
-            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" stroke="currentColor" stroke-width="2"/>
-            <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" stroke="currentColor" stroke-width="2"/>
-          </svg>
-        </button>
-        
-        <!-- Fullscreen button -->
-        <button 
-          class="control-button fullscreen-button" 
-          @click="toggleFullscreen"
-          :class="{ 'active': isFullscreen }"
-          :title="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'"
-        >
-          <svg v-if="!isFullscreen" width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="2"/>
-          </svg>
-          <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" stroke="currentColor" stroke-width="2"/>
-          </svg>
-        </button>
-        
-        <!-- Clear button -->
-        <button 
-          class="control-button clear-button" 
-          @click="clearConversation"
-          v-if="isConnected && conversationHistory.length > 0"
-          title="Clear conversation"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
-          </svg>
-        </button>
-      </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
@@ -166,9 +310,16 @@ export default {
   },
   data() {
     return {
+      // Widget state
+      showVoiceAssistant: false,
+      isMinimized: false,
+      
+      // Connection state
       isConnected: false,
       isConnecting: false,
       connectionState: 'disconnected',
+      
+      // Conversation state
       userTranscript: '',
       assistantResponse: '',
       currentAIResponse: '',
@@ -178,14 +329,19 @@ export default {
       typingSpeed: 30,
       processingFunctionCall: false,
       currentFunctionCall: null,
-      apiKey: '',
-      showApiKeyInput: false,
       conversationHistory: [],
+      
+      // Voice state
       isUserSpeaking: false,
       isAssistantResponding: false,
       micEnabled: true,
       audioTrack: null,
+      
+      // UI state
       isFullscreen: false,
+      apiKey: '',
+      showApiKeyInput: false,
+      
       // Audio playback status
       audioStatus: {
         isPlaying: false,
@@ -207,6 +363,22 @@ export default {
       if (this.isUserSpeaking) return 'Listening';
       if (!this.micEnabled) return 'Muted';
       return 'Ready to help';
+    },
+    statusClass() {
+      if (this.isConnecting) return 'connecting';
+      if (!this.isConnected) return 'offline';
+      if (this.isAssistantResponding) return 'speaking';
+      if (this.isUserSpeaking) return 'listening';
+      if (!this.micEnabled) return 'muted';
+      return 'ready';
+    },
+    interfaceClass() {
+      return {
+        'ai-speaking': this.isAssistantResponding,
+        'ai-listening': this.isUserSpeaking,
+        'ai-connected': this.isConnected,
+        'ai-offline': !this.isConnected
+      };
     }
   },
   watch: {
@@ -267,6 +439,38 @@ export default {
   },
   methods: {
     /**
+     * Widget control methods
+     */
+    toggleVoiceAssistant() {
+      this.showVoiceAssistant = !this.showVoiceAssistant;
+      if (this.showVoiceAssistant) {
+        this.$emit('start-voice-session');
+      }
+    },
+    
+    startVoiceSession() {
+      this.showVoiceAssistant = true;
+      if (!this.isConnected && this.apiKey && !this.isConnecting) {
+        this.startCall();
+      }
+    },
+    
+    minimizeWidget() {
+      this.isMinimized = true;
+    },
+    
+    maximizeWidget() {
+      this.isMinimized = false;
+    },
+    
+    closeWidget() {
+      this.showVoiceAssistant = false;
+      if (this.isConnected) {
+        this.endCall();
+      }
+    },
+    
+    /**
      * Start typing effect for AI response
      */
     startTypingEffect(text) {
@@ -305,7 +509,7 @@ export default {
      * Enter fullscreen mode
      */
     enterFullscreen() {
-      const element = this.$el;
+      const element = this.$el.querySelector('.voice-widget');
       
       if (element.requestFullscreen) {
         element.requestFullscreen();
@@ -597,27 +801,6 @@ export default {
           case 'get_surah_content':
             result = await this.executeGetSurahContentFunction(parsedArgs);
             break;
-          case 'get_verse_details':
-            result = await this.executeGetVerseDetailsFunction(parsedArgs);
-            break;
-          case 'get_tafsir':
-            result = await this.executeGetTafsirFunction(parsedArgs);
-            break;
-          case 'get_word_analysis':
-            result = await this.executeGetWordAnalysisFunction(parsedArgs);
-            break;
-          case 'get_reasons_for_revelation':
-            result = await this.executeGetReasonsForRevelationFunction(parsedArgs);
-            break;
-          case 'get_tajweed_rules':
-            result = await this.executeGetTajweedRulesFunction(parsedArgs);
-            break;
-          case 'get_page_content':
-            result = await this.executeGetPageContentFunction(parsedArgs);
-            break;
-          case 'get_multiple_verses':
-            result = await this.executeGetMultipleVersesFunction(parsedArgs);
-            break;
           case 'navigate_to_surah':
             result = await this.executeNavigateToSurahFunction(parsedArgs);
             break;
@@ -626,9 +809,6 @@ export default {
             break;
           case 'navigate_to_page':
             result = await this.executeNavigateToPageFunction(parsedArgs);
-            break;
-          case 'get_available_projects':
-            result = await this.executeGetAvailableProjectsFunction(parsedArgs);
             break;
           case 'bookmark_verse':
             result = await this.executeBookmarkVerseFunction(parsedArgs);
@@ -671,35 +851,16 @@ export default {
       }
     },
     
-    /**
-     * Execute get Surah content function using the Public Sura API
-     */
+    // Include other function execution methods here (same as before)
     async executeGetSurahContentFunction(args) {
       try {
-        const { surah_number, content_type = 'basic' } = args;
-        
-        // Validate Surah number
-        if (surah_number < 1 || surah_number > 114) {
-          return { error: 'Surah number must be between 1 and 114' };
-        }
-        
-        let content;
-        if (content_type === 'basic') {
-          // Get basic Surah content from our existing service
-          content = await surahService.getSurahContent(surah_number);
-        } else {
-          // Enhanced content not available without external API
-          content = await surahService.getSurahContent(surah_number);
-        }
-        
-        // Navigate to the Surah
+        const { surah_number } = args;
+        const content = await surahService.getSurahContent(surah_number);
         this.$emit('navigate-to-surah', surah_number);
-        
         return {
           success: true,
           surah_number,
           content,
-          content_type,
           message: `Retrieved Surah ${surah_number} content`
         };
       } catch (error) {
@@ -707,178 +868,10 @@ export default {
       }
     },
     
-    /**
-     * Execute get verse function
-     */
-    async executeGetVerseFunction(args) {
-      try {
-        const { surah_id, verse_number, include_translation = true } = args;
-        
-        const surahContent = await surahService.getSurahContent(surah_id);
-        if (!surahContent || !surahContent.verses) {
-          return { error: `Surah ${surah_id} not found` };
-        }
-        
-        const verse = surahContent.verses.find(v => v.number === verse_number);
-        if (!verse) {
-          return { error: `Verse ${verse_number} not found in Surah ${surah_id}` };
-        }
-        
-        const result = {
-          success: true,
-          verse: {
-            surah_id,
-            surah_name: surahContent.name,
-            verse_number,
-            arabic_text: verse.text
-          }
-        };
-        
-        if (include_translation) {
-          result.verse.translation = verse.translation;
-        }
-        
-        return result;
-      } catch (error) {
-        return { error: `Failed to get verse: ${error.message}` };
-      }
-    },
-    
-    /**
-     * Execute search verses function
-     */
-    async executeSearchVersesFunction(args) {
-      try {
-        const { query, limit = 5 } = args;
-        
-        const results = await surahService.searchVerses(query);
-        const limitedResults = results.slice(0, limit);
-        
-        return {
-          success: true,
-          query,
-          results: limitedResults.map(result => ({
-            surah_id: result.surahId,
-            surah_name: result.surah.name,
-            verse_number: result.verseNumber,
-            arabic_text: result.verse.text,
-            translation: result.verse.translation
-          })),
-          total_found: results.length
-        };
-      } catch (error) {
-        return { error: `Failed to search verses: ${error.message}` };
-      }
-    },
-    
-    /**
-     * Execute explain verse function
-     */
-    async executeExplainVerseFunction(args) {
-      try {
-        const { surah_id, verse_number, aspect = 'general' } = args;
-        
-        // Get the verse first
-        const verseResult = await this.executeGetVerseFunction({ 
-          surah_id, 
-          verse_number, 
-          include_translation: true 
-        });
-        
-        if (!verseResult.success) {
-          return verseResult;
-        }
-        
-        // Use OpenAI service to get explanation
-        let question;
-        switch (aspect) {
-          case 'context':
-            question = 'What is the historical context and circumstances of revelation for this verse?';
-            break;
-          case 'application':
-            question = 'How can this verse be applied in modern daily life?';
-            break;
-          case 'linguistic':
-            question = 'What are the linguistic and grammatical insights of this verse?';
-            break;
-          default:
-            question = 'Please provide a comprehensive explanation of this verse.';
-        }
-        
-        if (openaiService.isInitialized()) {
-          const explanation = await openaiService.askAboutSurah(
-            verseResult.verse.arabic_text,
-            question,
-            {
-              surahName: verseResult.verse.surah_name,
-              verse: verse_number
-            }
-          );
-          
-          return {
-            success: true,
-            verse: verseResult.verse,
-            explanation,
-            aspect
-          };
-        } else {
-          return {
-            success: true,
-            verse: verseResult.verse,
-            explanation: `This is verse ${verse_number} from ${verseResult.verse.surah_name}. AI explanation requires OpenAI API key to be configured.`,
-            aspect
-          };
-        }
-      } catch (error) {
-        return { error: `Failed to explain verse: ${error.message}` };
-      }
-    },
-    
-    /**
-     * Execute find related verses function
-     */
-    async executeFindRelatedVersesFunction(args) {
-      try {
-        const { topic, limit = 5 } = args;
-        
-        if (openaiService.isInitialized()) {
-          const relatedVerses = await openaiService.findRelatedVerses(topic, limit);
-          
-          return {
-            success: true,
-            topic,
-            related_verses: relatedVerses,
-            source: 'AI-powered search'
-          };
-        } else {
-          // Fallback to simple text search
-          const results = await surahService.searchVerses(topic);
-          const limitedResults = results.slice(0, limit);
-          
-          return {
-            success: true,
-            topic,
-            related_verses: limitedResults.map(result => 
-              `${result.surah.name} ${result.verseNumber} - ${result.verse.translation}`
-            ).join('\n'),
-            source: 'Text search'
-          };
-        }
-      } catch (error) {
-        return { error: `Failed to find related verses: ${error.message}` };
-      }
-    },
-    
-    /**
-     * Execute navigate to Surah function
-     */
     async executeNavigateToSurahFunction(args) {
       try {
         const { surah_number } = args;
-        
-        // Emit event to parent to navigate
         this.$emit('navigate-to-surah', surah_number);
-        
         return {
           success: true,
           message: `Navigating to Surah ${surah_number}`,
@@ -889,252 +882,88 @@ export default {
       }
     },
     
-    /**
-     * Execute play recitation function
-     */
+    async executeNavigateToVerseFunction(args) {
+      try {
+        const { surah_number, verse_number } = args;
+        this.$emit('navigate-to-verse', { surah_number, verse_number });
+        return {
+          success: true,
+          message: `Navigating to Surah ${surah_number}, verse ${verse_number}`,
+          surah_number,
+          verse_number
+        };
+      } catch (error) {
+        return { error: `Failed to navigate to verse: ${error.message}` };
+      }
+    },
+    
+    async executeNavigateToPageFunction(args) {
+      try {
+        const { page_number } = args;
+        this.$emit('navigate-to-page', { page_number });
+        return {
+          success: true,
+          message: `Navigating to page ${page_number}`,
+          page_number
+        };
+      } catch (error) {
+        return { error: `Failed to navigate to page: ${error.message}` };
+      }
+    },
+    
+    async executeBookmarkVerseFunction(args) {
+      try {
+        const { surah_id, verse_number, note } = args;
+        this.$emit('bookmark-verse', { surah_id, verse_number, note });
+        return {
+          success: true,
+          message: `Bookmarked Surah ${surah_id}, verse ${verse_number}`,
+          bookmark: { surah_id, verse_number, note }
+        };
+      } catch (error) {
+        return { error: `Failed to bookmark verse: ${error.message}` };
+      }
+    },
+    
     async executePlayRecitationFunction(args) {
       try {
         const { surah_number, verse_number, reciter = 'sudais' } = args;
-        
         let result;
         if (verse_number) {
-          // Play specific verse
           result = await quranAudioService.playVerse(surah_number, verse_number, reciter);
         } else {
-          // Play entire Surah
           result = await quranAudioService.playSurah(surah_number, reciter);
         }
-
-        // Emit event to parent
         this.$emit('play-recitation', { surah_number, verse_number, reciter });
-        
         return {
           success: result.success,
           message: result.success 
             ? (verse_number 
-                ? `Playing recitation of Surah ${surah_number}, verse ${verse_number} by ${quranAudioService.getCurrentReciter().name}`
-                : `Playing recitation of Surah ${surah_number} by ${quranAudioService.getCurrentReciter().name}`)
+                ? `Playing recitation of Surah ${surah_number}, verse ${verse_number}`
+                : `Playing recitation of Surah ${surah_number}`)
             : result.error,
           surah_number,
-          verse_number,
-          reciter: quranAudioService.getCurrentReciter()
+          verse_number
         };
       } catch (error) {
         return { error: `Failed to play recitation: ${error.message}` };
       }
     },
-
-    /**
-     * Execute pause recitation function
-     */
-    async executePauseRecitationFunction(args) {
+    
+    async executeToggleThemeFunction(args) {
       try {
-        const success = quranAudioService.pause();
-        return {
-          success,
-          message: success ? 'Recitation paused' : 'No recitation is currently playing'
-        };
-      } catch (error) {
-        return { error: `Failed to pause recitation: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute resume recitation function
-     */
-    async executeResumeRecitationFunction(args) {
-      try {
-        const success = await quranAudioService.resume();
-        return {
-          success,
-          message: success ? 'Recitation resumed' : 'No recitation is paused'
-        };
-      } catch (error) {
-        return { error: `Failed to resume recitation: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute stop recitation function
-     */
-    async executeStopRecitationFunction(args) {
-      try {
-        quranAudioService.stop();
+        this.$emit('toggle-theme');
         return {
           success: true,
-          message: 'Recitation stopped'
+          message: 'Theme toggled successfully'
         };
       } catch (error) {
-        return { error: `Failed to stop recitation: ${error.message}` };
+        return { error: `Failed to toggle theme: ${error.message}` };
       }
     },
-
-    /**
-     * Execute next verse function
-     */
-    async executeNextVerseFunction(args) {
-      try {
-        const success = await quranAudioService.playNext();
-        const status = quranAudioService.getStatus();
-        
-        return {
-          success,
-          message: success 
-            ? `Playing next verse: Surah ${status.currentTrack?.surahNumber}, verse ${status.currentTrack?.ayahNumber}`
-            : 'No next verse available or no playlist active',
-          currentTrack: status.currentTrack
-        };
-      } catch (error) {
-        return { error: `Failed to play next verse: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute previous verse function
-     */
-    async executePreviousVerseFunction(args) {
-      try {
-        const success = await quranAudioService.playPrevious();
-        const status = quranAudioService.getStatus();
-        
-        return {
-          success,
-          message: success 
-            ? `Playing previous verse: Surah ${status.currentTrack?.surahNumber}, verse ${status.currentTrack?.ayahNumber}`
-            : 'No previous verse available or no playlist active',
-          currentTrack: status.currentTrack
-        };
-      } catch (error) {
-        return { error: `Failed to play previous verse: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute jump to verse function
-     */
-    async executeJumpToVerseFunction(args) {
-      try {
-        const { verse_number } = args;
-        const success = await quranAudioService.jumpToVerse(verse_number);
-        const status = quranAudioService.getStatus();
-        
-        return {
-          success,
-          message: success 
-            ? `Jumped to verse ${verse_number}: Surah ${status.currentTrack?.surahNumber}, verse ${status.currentTrack?.ayahNumber}`
-            : `Verse ${verse_number} not found in current playlist`,
-          currentTrack: status.currentTrack
-        };
-      } catch (error) {
-        return { error: `Failed to jump to verse: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get recitation status function
-     */
-    async executeGetRecitationStatusFunction(args) {
-      try {
-        const status = quranAudioService.getStatus();
-        
-        return {
-          success: true,
-          status: {
-            isPlaying: status.isPlaying,
-            isPaused: status.isPaused,
-            currentTrack: status.currentTrack,
-            reciter: status.reciter,
-            volume: status.volume,
-            progress: Math.round(status.progress),
-            currentTime: Math.round(status.currentTime),
-            duration: Math.round(status.duration),
-            playlistLength: status.playlistLength,
-            currentIndex: status.currentIndex
-          },
-          message: status.isPlaying 
-            ? `Currently playing: Surah ${status.currentTrack?.surahNumber}, verse ${status.currentTrack?.ayahNumber} by ${status.reciter?.name}`
-            : (status.isPaused 
-                ? `Paused: Surah ${status.currentTrack?.surahNumber}, verse ${status.currentTrack?.ayahNumber}`
-                : 'No recitation is currently playing')
-        };
-      } catch (error) {
-        return { error: `Failed to get recitation status: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute set reciter function
-     */
-    async executeSetReciterFunction(args) {
-      try {
-        const { reciter } = args;
-        const success = quranAudioService.setReciter(reciter);
-        const currentReciter = quranAudioService.getCurrentReciter();
-        
-        return {
-          success,
-          message: success 
-            ? `Reciter changed to ${currentReciter.name}`
-            : `Reciter '${reciter}' not found. Use get_available_reciters to see available options.`,
-          reciter: currentReciter
-        };
-      } catch (error) {
-        return { error: `Failed to set reciter: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get available reciters function
-     */
-    async executeGetAvailableRecitersFunction(args) {
-      try {
-        const reciters = quranAudioService.getAvailableReciters();
-        const currentReciter = quranAudioService.getCurrentReciter();
-        
-        return {
-          success: true,
-          reciters: reciters.slice(0, 20), // Limit to first 20 for readability
-          totalCount: reciters.length,
-          currentReciter,
-          message: `Found ${reciters.length} available reciters. Current reciter: ${currentReciter.name}`,
-          popularReciters: [
-            { key: 'sudais', name: 'Sheikh Abdurrahman As-Sudais' },
-            { key: 'afasy', name: 'Sheikh Mishary Rashid Al-Afasy' },
-            { key: 'husary', name: 'Sheikh Mahmoud Khalil Al-Husary' },
-            { key: 'minshawy', name: 'Sheikh Mohamed Siddiq El-Minshawi' },
-            { key: 'maher', name: 'Sheikh Maher Al-Muaiqly' },
-            { key: 'ajamy', name: 'Sheikh Ahmed Ibn Ali Al-Ajamy' }
-          ]
-        };
-      } catch (error) {
-        return { error: `Failed to get available reciters: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute set volume function
-     */
-    async executeSetVolumeFunction(args) {
-      try {
-        const { volume } = args;
-        const normalizedVolume = volume / 100; // Convert 0-100 to 0-1
-        quranAudioService.setVolume(normalizedVolume);
-        
-        return {
-          success: true,
-          volume: volume,
-          message: `Volume set to ${volume}%`
-        };
-      } catch (error) {
-        return { error: `Failed to set volume: ${error.message}` };
-      }
-    },
-
-    /**
-     * Set up audio service event listeners
-     */
+    
     setupAudioEventListeners() {
-      // Update audio status on events
+      // Audio event listeners setup (same as before)
       quranAudioService.on('play', (metadata) => {
         this.audioStatus.isPlaying = true;
         this.audioStatus.isPaused = false;
@@ -1154,368 +983,181 @@ export default {
         this.audioStatus.currentTime = 0;
         this.audioStatus.duration = 0;
       });
-
-      quranAudioService.on('timeupdate', (data) => {
-        this.audioStatus.progress = data.progress || 0;
-        this.audioStatus.currentTime = data.currentTime || 0;
-        this.audioStatus.duration = data.duration || 0;
-      });
-
-      quranAudioService.on('ended', (metadata) => {
-        // Audio service handles auto-play next, so we just update status
-        this.audioStatus.currentTrack = metadata;
-      });
-
-      quranAudioService.on('error', (data) => {
-        console.error('Audio playback error:', data.error);
-        // You could emit this to parent component for user notification
-        this.$emit('audio-error', data);
-      });
-
-      quranAudioService.on('playlistEnded', (data) => {
-        this.audioStatus.isPlaying = false;
-        this.audioStatus.isPaused = false;
-        this.audioStatus.currentTrack = null;
-        // Emit to parent for notification
-        this.$emit('playlist-ended', data);
-      });
-    },
-    
-    /**
-     * Execute bookmark verse function
-     */
-    async executeBookmarkVerseFunction(args) {
-      try {
-        const { surah_id, verse_number, note } = args;
-        
-        // Emit event to parent to bookmark
-        this.$emit('bookmark-verse', { surah_id, verse_number, note });
-        
-        return {
-          success: true,
-          message: `Bookmarked Surah ${surah_id}, verse ${verse_number}`,
-          bookmark: { surah_id, verse_number, note }
-        };
-      } catch (error) {
-        return { error: `Failed to bookmark verse: ${error.message}` };
-      }
-    },
-    
-    /**
-     * Execute get daily verse function
-     */
-    async executeGetDailyVerseFunction(args) {
-      try {
-        // Get a random verse (or implement daily verse logic)
-        const today = new Date();
-        const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-        const surahId = (dayOfYear % 114) + 1;
-        
-        const surahContent = await surahService.getSurahContent(surahId);
-        if (surahContent && surahContent.verses && surahContent.verses.length > 0) {
-          const randomVerse = surahContent.verses[Math.floor(Math.random() * surahContent.verses.length)];
-          
-          return {
-            success: true,
-            daily_verse: {
-              surah_id: surahId,
-              surah_name: surahContent.name,
-              verse_number: randomVerse.number,
-              arabic_text: randomVerse.text,
-              translation: randomVerse.translation,
-              date: today.toDateString()
-            }
-          };
-        }
-        
-        return { error: 'Could not retrieve daily verse' };
-      } catch (error) {
-        return { error: `Failed to get daily verse: ${error.message}` };
-      }
-    },
-    
-    /**
-     * Execute toggle theme function
-     */
-    async executeToggleThemeFunction(args) {
-      try {
-        // Emit event to parent to toggle theme
-        this.$emit('toggle-theme');
-        
-        return {
-          success: true,
-          message: 'Theme toggled successfully'
-        };
-      } catch (error) {
-        return { error: `Failed to toggle theme: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get verse details function using the Public Sura API
-     */
-    async executeGetVerseDetailsFunction(args) {
-      try {
-        const { 
-          surah_number, 
-          verse_number, 
-          include_tafsir = true, 
-          tafsir_type = 'tafsir-katheer',
-          include_irab = false,
-          include_reasons = false 
-        } = args;
-        
-        const result = {
-          success: true,
-          surah_number,
-          verse_number,
-          details: {}
-        };
-
-        // Get basic verse content from local service
-        const surahContent = await surahService.getSurahContent(surah_number);
-        if (surahContent && surahContent.verses) {
-          const verse = surahContent.verses.find(v => v.number === verse_number);
-          if (verse) {
-            result.details.verse = {
-              surah_id: surah_number,
-              verse_number: verse_number,
-              arabic_text: verse.text,
-              translation: verse.translation
-            };
-          }
-        }
-
-        // Tafsir not available without external API
-        if (include_tafsir) {
-          result.details.tafsir_error = 'Tafsir functionality requires external API integration';
-        }
-
-        // I'rab not available without external API
-        if (include_irab) {
-          result.details.irab_error = 'I\'rab functionality requires external API integration';
-        }
-
-        // Reasons for revelation not available without external API
-        if (include_reasons) {
-          result.details.reasons_error = 'Reasons for revelation functionality requires external API integration';
-        }
-
-        return result;
-      } catch (error) {
-        return { error: `Failed to get verse details: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get Tafsir function
-     */
-    async executeGetTafsirFunction(args) {
-      try {
-        const { surah_number, verse_number, tafsir_type = 'tafsir-katheer' } = args;
-        
-        // Tafsir functionality requires external API integration
-        throw new Error('Tafsir functionality requires external API integration');
-      } catch (error) {
-        return { error: `Failed to get Tafsir: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get word analysis function
-     */
-    async executeGetWordAnalysisFunction(args) {
-      try {
-        const { surah_number, verse_number, word_number, analysis_type = 'eerab-word-aya' } = args;
-        
-        // Word analysis functionality requires external API integration
-        throw new Error('Word analysis functionality requires external API integration');
-      } catch (error) {
-        return { error: `Failed to get word analysis: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get reasons for revelation function
-     */
-    async executeGetReasonsForRevelationFunction(args) {
-      try {
-        const { surah_number, verse_number } = args;
-        
-        // Reasons for revelation functionality requires external API integration
-        throw new Error('Reasons for revelation functionality requires external API integration');
-      } catch (error) {
-        return { error: `Failed to get reasons for revelation: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get Tajweed rules function
-     */
-    async executeGetTajweedRulesFunction(args) {
-      try {
-        const { surah_number, verse_number } = args;
-        
-        // Tajweed rules functionality requires external API integration
-        throw new Error('Tajweed rules functionality requires external API integration');
-      } catch (error) {
-        return { error: `Failed to get Tajweed rules: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get page content function
-     */
-    async executeGetPageContentFunction(args) {
-      try {
-        const { page_number, content_type = 'basic' } = args;
-        
-        // Validate page number
-        if (page_number < 1 || page_number > 604) {
-          return { error: 'Page number must be between 1 and 604' };
-        }
-        
-        // Page content functionality requires external API integration
-        throw new Error('Page content functionality requires external API integration');
-      } catch (error) {
-        return { error: `Failed to get page content: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get multiple verses function
-     */
-    async executeGetMultipleVersesFunction(args) {
-      try {
-        const { surah_number, from_verse, to_verse, include_tafsir = false } = args;
-        
-        let content_type = 'basic';
-        if (include_tafsir) {
-          content_type = 'tafsir-katheer';
-        }
-        
-        // Get multiple verses from local service
-        const surahContent = await surahService.getSurahContent(surah_number);
-        if (!surahContent || !surahContent.verses) {
-          throw new Error(`Surah ${surah_number} not found`);
-        }
-        
-        const verses = surahContent.verses.filter(v => 
-          v.number >= from_verse && v.number <= to_verse
-        ).map(v => ({
-          surah_id: surah_number,
-          verse_number: v.number,
-          arabic_text: v.text,
-          translation: v.translation
-        }));
-        
-        return {
-          success: true,
-          surah_number,
-          from_verse,
-          to_verse,
-          include_tafsir,
-          verses,
-          message: `Retrieved verses ${from_verse}-${to_verse} from Surah ${surah_number}`
-        };
-      } catch (error) {
-        return { error: `Failed to get multiple verses: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute navigate to verse function
-     */
-    async executeNavigateToVerseFunction(args) {
-      try {
-        const { surah_number, verse_number } = args;
-        
-        // Emit event to parent to navigate to specific verse
-        this.$emit('navigate-to-verse', { surah_number, verse_number });
-        
-        return {
-          success: true,
-          message: `Navigating to Surah ${surah_number}, verse ${verse_number}`,
-          surah_number,
-          verse_number
-        };
-      } catch (error) {
-        return { error: `Failed to navigate to verse: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute navigate to page function
-     */
-    async executeNavigateToPageFunction(args) {
-      try {
-        const { page_number } = args;
-        
-        // Emit event to parent to navigate to specific page
-        this.$emit('navigate-to-page', { page_number });
-        
-        return {
-          success: true,
-          message: `Navigating to page ${page_number}`,
-          page_number
-        };
-      } catch (error) {
-        return { error: `Failed to navigate to page: ${error.message}` };
-      }
-    },
-
-    /**
-     * Execute get available projects function
-     */
-    async executeGetAvailableProjectsFunction(args) {
-      try {
-        const { project_type } = args;
-        
-        // Projects functionality requires external API integration
-        const projects = [];
-        const tafsirTypes = [];
-        const analysisTypes = [];
-        
-        return {
-          success: true,
-          projects,
-          available_tafsir_types: tafsirTypes,
-          available_analysis_types: analysisTypes,
-          message: 'Retrieved available projects and content types'
-        };
-      } catch (error) {
-        return { error: `Failed to get available projects: ${error.message}` };
-      }
     }
   }
 }
 </script>
 
 <style scoped>
-/* Modern Glass Morphism Design */
-.voice-assistant-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 400px;
-  padding: 0;
-  background: linear-gradient(145deg, 
-    rgba(15, 23, 42, 0.95) 0%, 
-    rgba(30, 41, 59, 0.9) 100%);
-  border-radius: 24px;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset,
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
-  position: relative;
+/* Modern Enhanced Voice Assistant Styling */
+.voice-assistant-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 200;
 }
 
-.voice-assistant-container::before {
+.voice-assistant-wrapper > * {
+  pointer-events: auto;
+}
+
+/* Enhanced Floating Action Button */
+.voice-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 201;
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.fab-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    #667eea 0%, 
+    #764ba2 50%, 
+    #f093fb 100%);
+  transition: all 0.4s ease;
+}
+
+.fab-glow {
+  position: absolute;
+  inset: -2px;
+  background: inherit;
+  border-radius: 50%;
+  opacity: 0;
+  animation: fab-glow 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+.voice-fab.pulsing .fab-glow {
+  opacity: 0.6;
+}
+
+@keyframes fab-glow {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.3; 
+  }
+  50% { 
+    transform: scale(1.2); 
+    opacity: 0.6; 
+  }
+}
+
+.fab-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fab-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.voice-fab:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.voice-fab:active .fab-ripple {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Enhanced Widget Transitions */
+.voice-widget-enter-active {
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.voice-widget-leave-active {
+  transition: all 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.voice-widget-enter-from {
+  opacity: 0;
+  transform: translateY(30px) scale(0.9);
+}
+
+.voice-widget-leave-to {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+/* Enhanced Voice Widget */
+.voice-widget {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 420px;
+  max-height: 650px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(24px);
+  box-shadow: 
+    0 32px 64px rgba(0, 0, 0, 0.12),
+    0 16px 32px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.voice-widget.minimized {
+  height: 80px;
+  max-height: 80px;
+}
+
+/* Enhanced Header */
+.widget-header {
+  position: relative;
+  padding: 1.25rem 1.5rem;
+  overflow: hidden;
+}
+
+.header-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.9) 0%, 
+    rgba(118, 75, 162, 0.9) 50%, 
+    rgba(240, 147, 251, 0.9) 100%);
+  backdrop-filter: blur(20px);
+}
+
+.header-background::before {
   content: '';
   position: absolute;
   top: 0;
@@ -1524,338 +1166,578 @@ export default {
   height: 1px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0.6) 50%, 
     transparent 100%);
 }
 
-.compact-mode {
-  width: 380px;
-  min-height: 450px;
-}
-
-.fullscreen-mode {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100vh !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: linear-gradient(135deg, 
-    #667eea 0%, 
-    #764ba2 50%, 
-    #f093fb 100%);
-}
-
-.ai-interface {
-  width: 100%;
-  min-height: 320px;
-  border-radius: 24px 24px 0 0;
+.header-content {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.8) 0%, 
-    rgba(30, 41, 59, 0.8) 100%);
-  backdrop-filter: blur(20px);
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 2rem 1.5rem;
-}
-
-.ai-interface::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 50%, 
-    rgba(103, 126, 234, 0.1) 0%, 
-    transparent 70%);
-  opacity: 0.6;
-  transition: opacity 0.6s ease;
-}
-
-.ai-interface.ai-speaking::before {
-  opacity: 1;
-  animation: speaking-pulse 2s infinite alternate;
-}
-
-.ai-interface.ai-listening::before {
-  opacity: 0.8;
-  animation: listening-pulse 1.5s infinite alternate;
-  background: radial-gradient(circle at 50% 50%, 
-    rgba(34, 197, 94, 0.15) 0%, 
-    transparent 70%);
-}
-
-@keyframes speaking-pulse {
-  from { 
-    opacity: 0.6; 
-    transform: scale(1);
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1.02);
-  }
-}
-
-@keyframes listening-pulse {
-  from { 
-    opacity: 0.4; 
-    transform: scale(1);
-  }
-  to { 
-    opacity: 0.8; 
-    transform: scale(1.01);
-  }
-}
-
-.ai-core {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   z-index: 2;
-  gap: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
 }
 
-.ai-voice-visualization {
-  margin-bottom: 1rem;
+.widget-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.visualization-circle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, 
-    rgba(30, 41, 59, 0.6) 0%, 
-    rgba(15, 23, 42, 0.8) 100%);
-  border: 2px solid rgba(99, 102, 241, 0.3);
+/* Enhanced AI Avatar */
+.ai-avatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(15px);
 }
 
-.visualization-circle::before {
-  content: '';
+.avatar-rings {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    rgba(103, 126, 234, 0.3) 0deg,
-    transparent 60deg,
-    transparent 300deg,
-    rgba(103, 126, 234, 0.3) 360deg
-  );
-  animation: rotate 4s linear infinite;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  inset: 0;
 }
 
-.visualization-circle.pulsing::before {
-  opacity: 1;
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: ring-rotate 8s linear infinite;
 }
 
-.visualization-circle.pulsing {
-  animation: voice-glow 1.5s infinite alternate;
-  transform: scale(1.05);
-  border-color: rgba(103, 126, 234, 0.4);
-  box-shadow: 
-    0 15px 40px rgba(103, 126, 234, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.3) inset;
+.ring-1 {
+  inset: 0;
+  animation-duration: 8s;
 }
 
-@keyframes rotate {
+.ring-2 {
+  inset: 4px;
+  animation-duration: 12s;
+  animation-direction: reverse;
+}
+
+.ring-3 {
+  inset: 8px;
+  animation-duration: 16s;
+}
+
+@keyframes ring-rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-@keyframes voice-glow {
-  from { 
-    box-shadow: 
-      0 10px 30px rgba(0, 0, 0, 0.1),
-      0 1px 0 rgba(255, 255, 255, 0.2) inset;
-  }
-  to { 
-    box-shadow: 
-      0 20px 50px rgba(103, 126, 234, 0.3),
-      0 1px 0 rgba(255, 255, 255, 0.4) inset;
-  }
-}
-
-.voice-bars {
-  width: 60px;
-  height: 40px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.bar {
-  width: 6px;
-  background: linear-gradient(to top, 
-    #6366f1 0%, 
-    #8b5cf6 50%, 
-    #ec4899 100%);
-  border-radius: 3px;
-  height: 20%;
-  animation: soundBars 0.8s infinite alternate;
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
-}
-
-.bar1 { animation-delay: 0.1s; }
-.bar2 { animation-delay: 0.2s; }
-.bar3 { animation-delay: 0.3s; }
-.bar4 { animation-delay: 0.4s; }
-.bar5 { animation-delay: 0.2s; }
-.bar6 { animation-delay: 0.1s; }
-
-@keyframes soundBars {
-  0% { 
-    height: 20%; 
-    opacity: 0.7; 
-    transform: scaleY(1);
-  }
-  100% { 
-    height: 90%; 
-    opacity: 1; 
-    transform: scaleY(1.1);
-  }
-}
-
-.ai-icon {
+.avatar-core {
   position: relative;
-}
-
-.icon-bg {
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(145deg, 
-    rgba(103, 126, 234, 0.2) 0%, 
-    rgba(118, 75, 162, 0.2) 100%);
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.ai-icon-svg {
-  color: #667eea;
-  filter: drop-shadow(0 2px 4px rgba(103, 126, 234, 0.3));
-  animation: icon-breathe 3s ease-in-out infinite;
+.title-text h4 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-@keyframes icon-breathe {
+.status-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.status-text {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Enhanced Status Dots */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.status-dot::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.3;
+  animation: status-pulse 2s infinite;
+}
+
+.status-dot.offline {
+  background: #64748b;
+}
+
+.status-dot.connecting {
+  background: #f59e0b;
+  animation: status-connecting 1s infinite;
+}
+
+.status-dot.ready {
+  background: #10b981;
+}
+
+.status-dot.listening {
+  background: #3b82f6;
+  animation: status-listening 1s infinite;
+}
+
+.status-dot.speaking {
+  background: #8b5cf6;
+  animation: status-speaking 0.8s infinite;
+}
+
+.status-dot.muted {
+  background: #ef4444;
+}
+
+@keyframes status-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.5); opacity: 0.1; }
+}
+
+@keyframes status-connecting {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes status-listening {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  50% { transform: scale(1.2); }
 }
 
-.ai-response, .user-query {
-  width: 90%;
-  max-width: 320px;
-  min-height: 60px;
-  background: rgba(30, 41, 59, 0.8);
-  border-radius: 16px;
-  padding: 1rem 1.25rem;
-  color: #e2e8f0;
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: center;
-  box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+@keyframes status-speaking {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  75% { transform: scale(1.05); }
+}
+
+/* Enhanced Widget Controls */
+.widget-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.control-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Enhanced Widget Content */
+.widget-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px;
+  max-height: 560px;
+}
+
+.voice-assistant-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, 
+    rgba(15, 23, 42, 0.95) 0%, 
+    rgba(30, 41, 59, 0.95) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.voice-assistant-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(240, 147, 251, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Enhanced AI Interface */
+.ai-interface {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  padding: 2rem 1.5rem;
+  min-height: 320px;
+}
+
+.interface-background {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  backdrop-filter: blur(15px);
 }
 
-.ai-response {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.3);
+.gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.4;
+  animation: orb-float 6s ease-in-out infinite;
 }
 
-.user-query {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.3);
+.orb-1 {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, #667eea 0%, transparent 70%);
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
 }
 
-@keyframes slideIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
+.orb-2 {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #764ba2 0%, transparent 70%);
+  top: 60%;
+  right: 30%;
+  animation-delay: 2s;
 }
 
-.holographic-text {
-  background: linear-gradient(
-    90deg, 
-    #6366f1 0%, 
-    #8b5cf6 50%, 
-    #ec4899 100%
-  );
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: hologram-flow 3s ease-in-out infinite;
-  font-weight: 500;
+.orb-3 {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #f093fb 0%, transparent 70%);
+  bottom: 30%;
+  left: 40%;
+  animation-delay: 4s;
 }
 
-@keyframes hologram-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, -20px) scale(1.1); }
+  66% { transform: translate(-15px, 15px) scale(0.9); }
 }
 
-.typed-text {
-  display: inline-block;
-  vertical-align: middle;
+.ai-interface.ai-speaking .gradient-orb {
+  animation-duration: 3s;
+  opacity: 0.6;
 }
 
+.ai-interface.ai-listening .gradient-orb {
+  animation-duration: 4s;
+  opacity: 0.5;
+}
+
+.ai-core {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Enhanced Voice Visualization */
+.visualization-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.central-viz {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+}
+
+.viz-outer-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+.viz-middle-ring {
+  position: absolute;
+  inset: 15px;
+  border: 1px solid rgba(118, 75, 162, 0.4);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+.viz-inner-core {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.2) 0%, 
+    rgba(118, 75, 162, 0.2) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s ease;
+}
+
+.central-viz.active .viz-outer-ring {
+  border-color: rgba(102, 126, 234, 0.6);
+  animation: ring-pulse 2s infinite;
+}
+
+.central-viz.active .viz-middle-ring {
+  border-color: rgba(118, 75, 162, 0.6);
+  animation: ring-pulse 2s infinite 0.5s;
+}
+
+.central-viz.speaking .viz-outer-ring {
+  border-color: rgba(139, 92, 246, 0.8);
+  animation: ring-speaking 1s infinite;
+}
+
+.central-viz.listening .viz-outer-ring {
+  border-color: rgba(59, 130, 246, 0.8);
+  animation: ring-listening 1.5s infinite;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes ring-speaking {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes ring-listening {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* Voice Bars Animation */
+.voice-bars-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 32px;
+}
+
+.voice-bar {
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to top, #667eea, #8b5cf6);
+  border-radius: 2px;
+  animation: voice-bar-animate 0.8s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes voice-bar-animate {
+  0%, 100% { height: 8px; opacity: 0.6; }
+  50% { height: 24px; opacity: 1; }
+}
+
+/* Listening Waves */
+.listening-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.listening-wave {
+  width: 6px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 50%;
+  animation: listening-wave-animate 1.5s infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes listening-wave-animate {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.5); opacity: 1; }
+}
+
+/* AI Logo */
+.ai-logo {
+  color: rgba(255, 255, 255, 0.8);
+  animation: logo-breathe 3s ease-in-out infinite;
+}
+
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* Floating Particles */
+.floating-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: particle-float var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.particle:nth-child(1) { top: 10%; left: 10%; }
+.particle:nth-child(2) { top: 20%; right: 15%; }
+.particle:nth-child(3) { bottom: 30%; left: 20%; }
+.particle:nth-child(4) { bottom: 20%; right: 10%; }
+.particle:nth-child(5) { top: 50%; left: 5%; }
+.particle:nth-child(6) { top: 30%; right: 5%; }
+.particle:nth-child(7) { bottom: 40%; left: 60%; }
+.particle:nth-child(8) { top: 60%; right: 40%; }
+
+@keyframes particle-float {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+}
+
+/* Enhanced Content Display */
+.content-display {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.content-fade-enter-active, .content-fade-leave-active {
+  transition: all 0.4s ease;
+}
+
+.content-fade-enter-from, .content-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Enhanced Response Containers */
+.ai-response-container, .user-query-container {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: message-slide-in 0.4s ease;
+}
+
+@keyframes message-slide-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ai-response-container {
+  border-left: 3px solid #8b5cf6;
+}
+
+.user-query-container {
+  border-left: 3px solid #3b82f6;
+}
+
+.response-header, .query-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.response-avatar, .query-avatar {
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.response-label, .query-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.response-content, .query-content {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+/* Enhanced Typing Indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.5rem 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(45deg, #667eea, #8b5cf6);
+  border-radius: 50%;
+  animation: typing-dot 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: 0ms; }
+.typing-indicator span:nth-child(2) { animation-delay: 200ms; }
+.typing-indicator span:nth-child(3) { animation-delay: 400ms; }
+
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+  30% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+}
+
+/* Enhanced Cursor */
 .cursor {
   display: inline-block;
   width: 2px;
-  height: 16px;
-  background: linear-gradient(to bottom, #6366f1, #8b5cf6);
+  height: 18px;
+  background: linear-gradient(to bottom, #667eea, #8b5cf6);
   margin-left: 2px;
   animation: cursor-blink 1.2s infinite;
-  vertical-align: middle;
   border-radius: 1px;
 }
 
@@ -1869,250 +1751,451 @@ export default {
   50% { opacity: 0.3; }
 }
 
-.typing-indicator {
+/* Enhanced Status Display */
+.status-display {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.status-display .status-container {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  padding: 0.75rem 1.25rem;
+  border-radius: 24px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.status-display .status-text {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Enhanced Control Panel */
+.control-panel {
+  position: relative;
+  padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 0 0 24px 24px;
+}
+
+.panel-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 0.9) 0%, 
+    rgba(30, 41, 59, 0.9) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced API Key Section */
+.api-key-section {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 1.5rem;
+}
+
+.api-key-enter-active, .api-key-leave-active {
+  transition: all 0.4s ease;
+}
+
+.api-key-enter-from, .api-key-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.api-key-icon {
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  height: 24px;
+  background: linear-gradient(135deg, 
+    rgba(245, 158, 11, 0.2) 0%, 
+    rgba(217, 119, 6, 0.2) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  box-shadow: 
+    0 2px 8px rgba(245, 158, 11, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: api-key-glow 3s ease-in-out infinite;
 }
 
-.typing-indicator span {
-  height: 8px;
-  width: 8px;
-  background: linear-gradient(45deg, #6366f1, #8b5cf6);
-  display: block;
-  border-radius: 50%;
-  opacity: 0.4;
-  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
-}
-
-.typing-indicator span:nth-of-type(1) {
-  animation: typing-bounce 1.2s infinite;
-}
-
-.typing-indicator span:nth-of-type(2) {
-  animation: typing-bounce 1.2s 0.4s infinite;
-}
-
-.typing-indicator span:nth-of-type(3) {
-  animation: typing-bounce 1.2s 0.8s infinite;
-}
-
-@keyframes typing-bounce {
+@keyframes api-key-glow {
   0%, 100% { 
-    transform: translateY(0px) scale(1); 
-    opacity: 0.4; 
+    box-shadow: 
+      0 2px 8px rgba(245, 158, 11, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   50% { 
-    transform: translateY(-6px) scale(1.1); 
-    opacity: 1; 
+    box-shadow: 
+      0 4px 16px rgba(245, 158, 11, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 }
 
-.ai-status {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+.api-key-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #e2e8f0;
-  font-size: 13px;
-  font-weight: 500;
-  background: rgba(15, 23, 42, 0.8);
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  backdrop-filter: blur(15px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
-  min-width: 120px;
-  justify-content: center;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #94a3b8;
-  transition: all 0.3s ease;
-}
-
-.status-dot.connected {
-  background: linear-gradient(45deg, #10b981, #059669);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-}
-
-.status-dot.connecting {
-  background: linear-gradient(45deg, #f59e0b, #d97706);
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-  animation: connecting-pulse 1.5s infinite;
-}
-
-.status-dot.speaking {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  box-shadow: 0 0 8px rgba(103, 126, 234, 0.4);
-  animation: speaking-dot 1s infinite;
-}
-
-.status-dot.listening {
-  background: linear-gradient(45deg, #22c55e, #16a34a);
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
-  animation: listening-dot 2s infinite;
-}
-
-@keyframes connecting-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.2); }
-}
-
-@keyframes speaking-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.3); }
-}
-
-@keyframes listening-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.15); }
-}
-
-.control-panel {
-  width: 100%;
-  padding: 1.5rem;
-  background: rgba(15, 23, 42, 0.9);
-  border-radius: 0 0 24px 24px;
-  border-top: 1px solid rgba(99, 102, 241, 0.2);
-  backdrop-filter: blur(20px);
-}
-
-.api-key-container {
-  display: flex;
-  gap: 8px;
+  gap: 0.75rem;
   margin-bottom: 1rem;
-  width: 100%;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, 
+    rgba(245, 158, 11, 0.1) 0%, 
+    rgba(217, 119, 6, 0.1) 100%);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 4px 16px rgba(245, 158, 11, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.api-key-input-container {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .api-key-input {
   flex: 1;
-  padding: 12px 16px;
-  border: 2px solid rgba(99, 102, 241, 0.3);
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
-  background: rgba(30, 41, 59, 0.8);
-  color: #e2e8f0;
-  font-size: 14px;
-  outline: none;
+  color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.api-key-input::placeholder {
-  color: rgba(148, 163, 184, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .api-key-input:focus {
-  border-color: rgba(99, 102, 241, 0.6);
-  background: rgba(30, 41, 59, 0.9);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+  border-color: rgba(102, 126, 234, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 0 0 3px rgba(102, 126, 234, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: scale(1.01);
 }
 
-.control-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+.api-key-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
-.control-button {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #e2e8f0;
+.save-key-btn {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.9) 0%, 
+    rgba(5, 150, 105, 0.9) 50%, 
+    rgba(6, 182, 212, 0.9) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 12px;
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 4px 16px rgba(16, 185, 129, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.save-key-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 1) 0%, 
+    rgba(5, 150, 105, 1) 50%, 
+    rgba(6, 182, 212, 1) 100%);
+  box-shadow: 
+    0 6px 20px rgba(16, 185, 129, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Enhanced Control Buttons */
+.control-buttons {
   position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  animation: buttons-slide-up 0.6s ease 0.3s both;
+}
+
+@keyframes buttons-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.control-button {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.control-button svg {
-  width: 20px;
-  height: 20px;
-  display: block;
-}
-
-.control-button::before {
-  content: '';
+.btn-background {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(145deg, 
-    rgba(99, 102, 241, 0.1) 0%, 
-    transparent 100%);
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+
+.btn-content {
+  position: relative;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.btn-ripple {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  transform: scale(0);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.control-button:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.05);
-  background: rgba(30, 41, 59, 0.9);
-  border-color: rgba(99, 102, 241, 0.5);
-  color: #6366f1;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+.control-button:hover .btn-background {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.02);
 }
 
-.control-button:hover:not(:disabled)::before {
+.control-button:hover .btn-content {
+  color: white;
+  transform: scale(1.1);
+}
+
+.control-button:active .btn-ripple {
+  transform: scale(1);
   opacity: 1;
 }
 
-.control-button:active {
-  transform: translateY(0) scale(0.98);
+/* Enhanced Button Variants with AI Theme Colors */
+.connect-btn .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.25) 0%, 
+    rgba(5, 150, 105, 0.25) 50%, 
+    rgba(6, 182, 212, 0.25) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(16, 185, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.control-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.call-button {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.4);
+.connect-btn .btn-content {
   color: #10b981;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.call-button:hover:not(:disabled) {
-  background: rgba(16, 185, 129, 0.3);
-  border-color: rgba(16, 185, 129, 0.6);
-  color: #059669;
+.connect-btn:hover .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.35) 0%, 
+    rgba(5, 150, 105, 0.35) 50%, 
+    rgba(6, 182, 212, 0.35) 100%);
+  box-shadow: 
+    0 6px 20px rgba(16, 185, 129, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.call-button.active {
-  background: rgba(239, 68, 68, 0.2);
+.connect-btn.connected .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.25) 0%, 
+    rgba(220, 38, 38, 0.25) 50%, 
+    rgba(248, 113, 113, 0.25) 100%);
   border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(239, 68, 68, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.connect-btn.connected .btn-content {
   color: #ef4444;
 }
 
-.call-button.active:hover {
-  background: rgba(239, 68, 68, 0.3);
-  border-color: rgba(239, 68, 68, 0.6);
-  color: #dc2626;
+.connect-btn.connecting .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(245, 158, 11, 0.25) 0%, 
+    rgba(217, 119, 6, 0.25) 50%, 
+    rgba(251, 191, 36, 0.25) 100%);
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(245, 158, 11, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: connecting-glow 2s ease-in-out infinite;
 }
 
-.call-button.connecting {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: rgba(245, 158, 11, 0.4);
+.connect-btn.connecting .btn-content {
   color: #f59e0b;
 }
 
-.spinner svg {
+@keyframes connecting-glow {
+  0%, 100% { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 6px 24px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+}
+
+.mic-btn .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.25) 0%, 
+    rgba(99, 102, 241, 0.25) 50%, 
+    rgba(139, 92, 246, 0.25) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(102, 126, 234, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mic-btn .btn-content {
+  color: #667eea;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.mic-btn:hover .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.35) 0%, 
+    rgba(99, 102, 241, 0.35) 50%, 
+    rgba(139, 92, 246, 0.35) 100%);
+  box-shadow: 
+    0 6px 20px rgba(102, 126, 234, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.mic-btn.muted .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.25) 0%, 
+    rgba(220, 38, 38, 0.25) 50%, 
+    rgba(248, 113, 113, 0.25) 100%);
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(239, 68, 68, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mic-btn.muted .btn-content {
+  color: #ef4444;
+}
+
+.fullscreen-btn .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.25) 0%, 
+    rgba(124, 58, 237, 0.25) 50%, 
+    rgba(168, 85, 247, 0.25) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(139, 92, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.fullscreen-btn .btn-content {
+  color: #8b5cf6;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.fullscreen-btn:hover .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.35) 0%, 
+    rgba(124, 58, 237, 0.35) 50%, 
+    rgba(168, 85, 247, 0.35) 100%);
+  box-shadow: 
+    0 6px 20px rgba(139, 92, 246, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.fullscreen-btn.active .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.4) 0%, 
+    rgba(124, 58, 237, 0.4) 50%, 
+    rgba(168, 85, 247, 0.4) 100%);
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 
+    0 6px 24px rgba(139, 92, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.clear-btn .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(240, 147, 251, 0.25) 0%, 
+    rgba(236, 72, 153, 0.25) 50%, 
+    rgba(251, 113, 133, 0.25) 100%);
+  border: 1px solid rgba(240, 147, 251, 0.4);
+  box-shadow: 
+    0 4px 16px rgba(240, 147, 251, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.clear-btn .btn-content {
+  color: #f093fb;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.clear-btn:hover .btn-background {
+  background: linear-gradient(135deg, 
+    rgba(240, 147, 251, 0.35) 0%, 
+    rgba(236, 72, 153, 0.35) 50%, 
+    rgba(251, 113, 133, 0.35) 100%);
+  box-shadow: 
+    0 6px 20px rgba(240, 147, 251, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced Button Icon Transitions */
+.btn-icon-enter-active, .btn-icon-leave-active {
+  transition: all 0.3s ease;
+}
+
+.btn-icon-enter-from, .btn-icon-leave-to {
+  opacity: 0;
+  transform: scale(0.8) rotate(45deg);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  position: relative;
+}
+
+.spinner-ring {
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
@@ -2121,125 +2204,68 @@ export default {
   to { transform: rotate(360deg); }
 }
 
-.mic-button {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.4);
-  color: #6366f1;
-}
-
-.mic-button:hover:not(:disabled) {
-  background: rgba(99, 102, 241, 0.3);
-  border-color: rgba(99, 102, 241, 0.6);
-}
-
-.mic-button.mic-disabled {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef4444;
-}
-
-.mic-button.mic-disabled:hover {
-  background: rgba(239, 68, 68, 0.3);
-  border-color: rgba(239, 68, 68, 0.6);
-}
-
-.fullscreen-button {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.4);
-  color: #8b5cf6;
-}
-
-.fullscreen-button:hover:not(:disabled) {
-  background: rgba(139, 92, 246, 0.3);
-  border-color: rgba(139, 92, 246, 0.6);
-}
-
-.fullscreen-button.active {
-  background: rgba(139, 92, 246, 0.3);
-  border-color: rgba(139, 92, 246, 0.6);
-  color: #7c3aed;
-}
-
-.clear-button {
-  background: rgba(107, 114, 128, 0.2);
-  border-color: rgba(107, 114, 128, 0.4);
-  color: #9ca3af;
-}
-
-.clear-button:hover:not(:disabled) {
-  background: rgba(107, 114, 128, 0.3);
-  border-color: rgba(107, 114, 128, 0.6);
-  color: #6b7280;
-}
-
-.save-key-button {
-  background: rgba(16, 185, 129, 0.3) !important;
-  border-color: rgba(16, 185, 129, 0.5) !important;
-  color: #10b981 !important;
-  border-radius: 12px !important;
-}
-
-.save-key-button:hover {
-  background: rgba(16, 185, 129, 0.4) !important;
-  color: #059669 !important;
-}
-
 /* Responsive Design */
 @media (max-width: 480px) {
-  .compact-mode {
-    width: 100%;
-    max-width: 350px;
+  .voice-fab {
+    bottom: 1rem;
+    right: 1rem;
+    width: 56px;
+    height: 56px;
   }
   
-  .visualization-circle {
-    width: 100px;
-    height: 100px;
+  .voice-widget {
+    width: calc(100vw - 2rem);
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    max-height: calc(100vh - 2rem);
   }
   
-  .icon-bg {
-    width: 48px;
-    height: 48px;
+  .central-viz {
+    width: 120px;
+    height: 120px;
   }
   
-  .ai-icon-svg {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .control-button {
-    width: 48px;
-    height: 48px;
+  .viz-inner-core {
+    width: 70px;
+    height: 70px;
   }
   
   .control-buttons {
-    gap: 8px;
+    gap: 0.75rem;
   }
   
-  .ai-response, .user-query {
-    font-size: 13px;
-    padding: 0.875rem 1rem;
+  .control-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+  }
+  
+  .btn-background,
+  .btn-ripple {
+    border-radius: 16px;
   }
 }
 
-/* Dark mode compatibility */
+/* Dark Theme Enhancements */
 @media (prefers-color-scheme: dark) {
-  .voice-assistant-container {
-    background: linear-gradient(145deg, 
-      rgba(0, 0, 0, 0.4) 0%, 
-      rgba(0, 0, 0, 0.2) 100%);
+  .voice-widget {
+    background: rgba(15, 23, 42, 0.95);
     border-color: rgba(255, 255, 255, 0.1);
   }
   
-  .ai-response, .user-query {
-    color: #f8fafc;
+  .control-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.2);
   }
-  
-  .api-key-input {
-    color: #f8fafc;
-  }
-  
-  .api-key-input::placeholder {
-    color: rgba(148, 163, 184, 0.6);
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>

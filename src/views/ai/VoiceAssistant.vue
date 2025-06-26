@@ -2009,64 +2009,66 @@ export default {
 /* Enhanced Button Variants with AI Theme Colors */
 .connect-btn .btn-background {
   background: linear-gradient(135deg, 
-    rgba(16, 185, 129, 0.25) 0%, 
-    rgba(5, 150, 105, 0.25) 50%, 
-    rgba(6, 182, 212, 0.25) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.4);
+    rgba(102, 126, 234, 0.25) 0%, 
+    rgba(118, 75, 162, 0.25) 50%, 
+    rgba(240, 147, 251, 0.25) 100%);
+  border: 1px solid rgba(102, 126, 234, 0.4);
   box-shadow: 
-    0 4px 16px rgba(16, 185, 129, 0.15),
+    0 4px 16px rgba(102, 126, 234, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .connect-btn .btn-content {
-  color: #10b981;
+  color: #667eea;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .connect-btn:hover .btn-background {
   background: linear-gradient(135deg, 
-    rgba(16, 185, 129, 0.35) 0%, 
-    rgba(5, 150, 105, 0.35) 50%, 
-    rgba(6, 182, 212, 0.35) 100%);
+    rgba(102, 126, 234, 0.35) 0%, 
+    rgba(118, 75, 162, 0.35) 50%, 
+    rgba(240, 147, 251, 0.35) 100%);
   box-shadow: 
-    0 6px 20px rgba(16, 185, 129, 0.25),
+    0 6px 20px rgba(102, 126, 234, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+/* Connected State - Using Purple from Palette */
 .connect-btn.connected .btn-background {
   background: linear-gradient(135deg, 
-    rgba(239, 68, 68, 0.25) 0%, 
-    rgba(220, 38, 38, 0.25) 50%, 
-    rgba(248, 113, 113, 0.25) 100%);
-  border-color: rgba(239, 68, 68, 0.4);
+    rgba(118, 75, 162, 0.35) 0%, 
+    rgba(240, 147, 251, 0.35) 50%, 
+    rgba(102, 126, 234, 0.35) 100%);
+  border-color: rgba(118, 75, 162, 0.4);
   box-shadow: 
-    0 4px 16px rgba(239, 68, 68, 0.15),
+    0 4px 16px rgba(118, 75, 162, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .connect-btn.connected .btn-content {
-  color: #ef4444;
+  color: #764ba2;
 }
 
+/* Connecting State - Using Pink from Palette */
 .connect-btn.connecting .btn-background {
   background: linear-gradient(135deg, 
-    rgba(245, 158, 11, 0.25) 0%, 
-    rgba(217, 119, 6, 0.25) 50%, 
-    rgba(251, 191, 36, 0.25) 100%);
-  border-color: rgba(245, 158, 11, 0.4);
+    rgba(240, 147, 251, 0.25) 0%, 
+    rgba(118, 75, 162, 0.25) 50%, 
+    rgba(102, 126, 234, 0.25) 100%);
+  border-color: rgba(240, 147, 251, 0.4);
   box-shadow: 
-    0 4px 16px rgba(245, 158, 11, 0.15),
+    0 4px 16px rgba(240, 147, 251, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   animation: connecting-glow 2s ease-in-out infinite;
 }
 
 .connect-btn.connecting .btn-content {
-  color: #f59e0b;
+  color: #f093fb;
 }
 
 @keyframes connecting-glow {
-  0%, 100% { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
-  50% { box-shadow: 0 6px 24px rgba(245, 158, 11, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+  0%, 100% { box-shadow: 0 4px 16px rgba(240, 147, 251, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 6px 24px rgba(240, 147, 251, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
 }
 
 .mic-btn .btn-background {
@@ -2112,38 +2114,39 @@ export default {
 
 .fullscreen-btn .btn-background {
   background: linear-gradient(135deg, 
-    rgba(139, 92, 246, 0.25) 0%, 
-    rgba(124, 58, 237, 0.25) 50%, 
-    rgba(168, 85, 247, 0.25) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.4);
+    rgba(118, 75, 162, 0.25) 0%, 
+    rgba(240, 147, 251, 0.25) 50%, 
+    rgba(102, 126, 234, 0.25) 100%);
+  border: 1px solid rgba(118, 75, 162, 0.4);
   box-shadow: 
-    0 4px 16px rgba(139, 92, 246, 0.15),
+    0 4px 16px rgba(118, 75, 162, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .fullscreen-btn .btn-content {
-  color: #8b5cf6;
+  color: #764ba2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .fullscreen-btn:hover .btn-background {
   background: linear-gradient(135deg, 
-    rgba(139, 92, 246, 0.35) 0%, 
-    rgba(124, 58, 237, 0.35) 50%, 
-    rgba(168, 85, 247, 0.35) 100%);
+    rgba(118, 75, 162, 0.35) 0%, 
+    rgba(240, 147, 251, 0.35) 50%, 
+    rgba(102, 126, 234, 0.35) 100%);
   box-shadow: 
-    0 6px 20px rgba(139, 92, 246, 0.25),
+    0 6px 20px rgba(118, 75, 162, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+/* Active Fullscreen State */
 .fullscreen-btn.active .btn-background {
   background: linear-gradient(135deg, 
-    rgba(139, 92, 246, 0.4) 0%, 
-    rgba(124, 58, 237, 0.4) 50%, 
-    rgba(168, 85, 247, 0.4) 100%);
-  border-color: rgba(139, 92, 246, 0.6);
+    rgba(118, 75, 162, 0.4) 0%, 
+    rgba(240, 147, 251, 0.4) 50%, 
+    rgba(102, 126, 234, 0.4) 100%);
+  border-color: rgba(118, 75, 162, 0.6);
   box-shadow: 
-    0 6px 24px rgba(139, 92, 246, 0.3),
+    0 6px 24px rgba(118, 75, 162, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
